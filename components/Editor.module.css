@@ -1,0 +1,530 @@
+.editor {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: #f2efe9;
+  overflow: hidden;
+}
+
+.loading,
+.notFound {
+  flex: 1;
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: var(--color-muted);
+}
+
+/* ---------- Gornja traka ---------- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  background: #fff;
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.backLink {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+.backLink:hover {
+  color: var(--color-primary-dark);
+}
+
+.titleInput {
+  flex: 1;
+  min-width: 100px;
+  border: 1px solid transparent;
+  background: transparent;
+  font-family: var(--font-elegant), Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  color: var(--color-text);
+}
+.titleInput:hover,
+.titleInput:focus {
+  border-color: var(--color-border);
+  background: var(--color-bg);
+  outline: none;
+}
+
+.navGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  white-space: nowrap;
+}
+.navGroup button {
+  border: 1px solid var(--color-border);
+  background: #fff;
+  border-radius: 999px;
+  width: 30px;
+  height: 30px;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+.navGroup button:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
+}
+.navGroup button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.pageCounter {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  white-space: nowrap;
+  min-width: 150px;
+  text-align: center;
+}
+
+/* ---------- Raspored ---------- */
+
+.body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+/* ---------- Levo: pregled strana (korice + razvodi) ---------- */
+
+.pagesRail {
+  width: 210px;
+  flex-shrink: 0;
+  min-height: 0;
+  border-right: 1px solid var(--color-border);
+  background: #fff;
+  padding: 0.9rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.pagesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.pageThumbWrap {
+  border: 2px solid transparent;
+  border-radius: 10px;
+  padding: 4px;
+}
+.pageThumbActive {
+  border-color: var(--color-primary);
+}
+
+.pageThumbBtn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.coverThumbInner {
+  width: 62%;
+  margin: 0 auto;
+}
+.spreadThumbInner {
+  display: flex;
+  gap: 2px;
+}
+.spreadThumbInner > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.pageThumbMeta {
+  margin-top: 0.3rem;
+  font-size: 0.7rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+/* ---------- Sredina: platno (workbook strane) ---------- */
+
+.stageArea {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 0;
+  min-height: 0;
+}
+
+.coverWrap {
+  width: min(440px, 100%);
+}
+
+.spreadWrap {
+  width: min(860px, 100%);
+  display: flex;
+  gap: 8px;
+}
+
+.pageSlot {
+  flex: 1;
+  min-width: 0;
+  border-radius: 6px;
+  transition: box-shadow 0.15s ease;
+}
+.pageSlotActive {
+  box-shadow: 0 0 0 2px var(--color-primary);
+  border-radius: 6px;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  container-type: inline-size;
+  user-select: none;
+}
+
+.element {
+  position: absolute;
+}
+.interactiveEl {
+  cursor: move;
+  touch-action: none;
+}
+.elementSelected {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Prazan okvir rasporeda — klikom se bira fotografija za to mesto. */
+.emptySlot {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3em;
+  border: 2px dashed #c9c0b0;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.45);
+  color: var(--color-muted);
+  cursor: pointer;
+}
+.emptySlot:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
+  background: rgba(184, 137, 90, 0.08);
+}
+.emptySlotPlus {
+  font-size: 9cqw;
+  line-height: 1;
+  font-weight: 300;
+}
+.emptySlotLabel {
+  font-size: 2.6cqw;
+  text-align: center;
+}
+@container (max-width: 160px) {
+  .emptySlotLabel {
+    display: none;
+  }
+}
+
+.text {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  word-break: break-word;
+  line-height: 1.25;
+  padding: 0.2em;
+}
+.text[contenteditable="true"] {
+  cursor: text;
+  outline: 1px dashed var(--color-primary);
+}
+
+.resizeHandle {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 14px;
+  height: 14px;
+  background: var(--color-primary);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  cursor: nwse-resize;
+}
+
+/* Vodilje centra strane — pojavljuju se dok se element pomera, da bi se
+   znalo gde je vodoravni/uspravni centar strane; postaju istaknute kad
+   se element "zalepi" za centar. */
+.centerGuideV {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: rgba(184, 137, 90, 0.35);
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 15;
+}
+.centerGuideH {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: rgba(184, 137, 90, 0.35);
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 15;
+}
+.centerGuideActive {
+  background: var(--color-primary);
+  box-shadow: 0 0 4px rgba(184, 137, 90, 0.6);
+}
+
+/* Sandbox za snimanje strane u PDF — van vidnog polja, uvek u punoj
+   veličini, nezavisno od trenutnog prikaza u editoru. */
+.exportSandbox {
+  position: fixed;
+  top: 0;
+  left: -99999px;
+  width: 900px;
+}
+
+/* ---------- Desno: alatke ---------- */
+
+.panel {
+  width: 290px;
+  flex-shrink: 0;
+  min-height: 0;
+  border-left: 1px solid var(--color-border);
+  background: #fff;
+  padding: 1rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.panelSection h3 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+  margin: 0 0 0.6rem;
+}
+
+.hint {
+  font-size: 0.75rem;
+  color: #a39c8d;
+  margin: -0.3rem 0 0.6rem;
+}
+
+.swatchRow {
+  display: flex;
+  gap: 0.6rem;
+}
+.swatch {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 2px solid var(--color-border);
+  position: relative;
+}
+.swatchActive {
+  border-color: var(--color-primary);
+}
+.swatchCheck {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary-dark);
+  font-weight: 700;
+  text-shadow: 0 0 3px #fff;
+}
+
+.addRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.layoutRow {
+  display: flex;
+  gap: 0.5rem;
+}
+.layoutBtn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem 0.3rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+.layoutBtn:hover {
+  border-color: var(--color-primary);
+}
+.layoutBtnActive {
+  border-color: var(--color-primary);
+  background: #fbf3ea;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+
+.layoutIcon {
+  position: relative;
+  display: block;
+  width: 36px;
+  height: 28px;
+  border-radius: 4px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+}
+.layoutIconRect {
+  position: absolute;
+  background: var(--color-primary);
+  opacity: 0.4;
+  border-radius: 1px;
+}
+.layoutBtnActive .layoutIconRect {
+  opacity: 0.75;
+}
+
+.fontRow {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+}
+.fontBtn {
+  flex: 1;
+  padding: 0.5rem 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 1.05rem;
+}
+.fontBtnActive {
+  border-color: var(--color-primary);
+  background: #fbf3ea;
+}
+
+.fieldLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: #4a453d;
+  margin-bottom: 0.7rem;
+}
+
+.toggleRow {
+  display: flex;
+  gap: 0.4rem;
+}
+.toggleRow button {
+  flex: 1;
+  border: 1px solid var(--color-border);
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.4rem 0;
+}
+.toggleActive {
+  border-color: var(--color-primary) !important;
+  background: #fbf3ea;
+}
+
+.deleteBtn {
+  margin-top: 0.6rem;
+  width: 100%;
+  border: 1px solid #d98c6b;
+  color: #b3452a;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.55rem;
+  font-size: 0.85rem;
+}
+.deleteBtn:hover {
+  background: #fdeee9;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  /* Na uskim ekranima se sve tri kolone slažu jedna ispod druge, pa se
+     vraća uobičajeno skrolovanje cele strane umesto fiksnih panela. */
+  .editor {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+  .body {
+    flex-direction: column;
+  }
+  .pagesRail {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    order: 2;
+  }
+  .pagesList {
+    flex-direction: row;
+  }
+  .pageThumbWrap {
+    width: 130px;
+    flex-shrink: 0;
+  }
+  .stageArea {
+    order: 1;
+    padding: 1.25rem;
+    overflow: visible;
+  }
+  .panel {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+    overflow-y: visible;
+    order: 3;
+  }
+}

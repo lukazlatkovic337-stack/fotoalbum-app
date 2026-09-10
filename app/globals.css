@@ -1,0 +1,301 @@
+:root {
+  --color-bg: #faf8f5;
+  --color-text: #23211d;
+  --color-muted: #6b6459;
+  --color-primary: #b8895a;
+  --color-primary-dark: #9c7047;
+  --color-border: #e7e1d8;
+  --radius: 14px;
+  --shadow: 0 20px 45px -22px rgba(30, 20, 10, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-modern), system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ---------- Zajednička dugmad ---------- */
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: 0.8rem 1.6rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+.btn-primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  padding: 0.7rem 1.3rem;
+  border-radius: 999px;
+  color: var(--color-text);
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.btn-ghost:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
+}
+
+/* ---------- Početna strana — "Moonlight" tema ---------- */
+/* Ovi tonovi su lokalni za početnu stranu (ne diraju --color-* promenljive
+   koje koristi editor) — noćno-plava/antracit pozadina, mesečina-krem
+   akcenat, u stilu poslatog loga. */
+
+.home {
+  --moon-bg-top: #4b4f58;
+  --moon-bg-mid: #2c2f36;
+  --moon-bg-bottom: #16171a;
+  --moon-text: #f3f1ec;
+  --moon-muted: #aaadb5;
+  --moon-accent: #d9c08a;
+
+  min-height: 100vh;
+  background: radial-gradient(
+      120% 90% at 50% -10%,
+      var(--moon-bg-top) 0%,
+      var(--moon-bg-mid) 55%,
+      var(--moon-bg-bottom) 100%
+    );
+  color: var(--moon-text);
+}
+
+.home-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 4.5rem 1.5rem 5rem;
+}
+
+.home-hero {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 3.5rem;
+}
+
+.home-brand {
+  --brand-h: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+  margin: 0 auto 1.5rem;
+}
+
+.home-logo {
+  width: auto;
+  height: var(--brand-h);
+  flex-shrink: 0;
+  filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.45));
+}
+
+.home-brand-text {
+  height: var(--brand-h);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+.home-brand-title {
+  font-family: var(--font-elegant), Georgia, serif;
+  font-size: clamp(1.4rem, 2.8vw, 1.9rem);
+  line-height: 1.2;
+  margin: 0;
+  color: var(--moon-text);
+  white-space: nowrap;
+}
+
+.home-brand-subtitle {
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  color: var(--moon-muted);
+  margin: 0.2rem 0 0;
+}
+
+.home-hero p {
+  color: var(--moon-muted);
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.type-card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  background: #1b1d21;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius);
+  padding: 2rem 1.6rem;
+  min-height: 230px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+/* Zamućena fotografija događaja kao pozadina kartice. */
+.type-card::before {
+  content: "";
+  position: absolute;
+  inset: -28px;
+  background-image: var(--card-photo);
+  background-size: cover;
+  background-position: center;
+  filter: blur(7px) brightness(0.55) saturate(1.05);
+  transition: transform 0.35s ease;
+}
+
+/* Tamni preliv preko slike da tekst ostane čitljiv. */
+.type-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(16, 18, 22, 0.4) 0%,
+    rgba(16, 18, 22, 0.72) 100%
+  );
+}
+
+/* Sadržaj kartice iznad slike i preliva. */
+.type-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.type-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 45px -20px rgba(0, 0, 0, 0.6);
+  border-color: var(--moon-accent);
+}
+
+.type-card:hover::before {
+  transform: scale(1.06);
+}
+
+.type-icon {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.type-card h2 {
+  font-family: var(--font-elegant), Georgia, serif;
+  font-size: 1.35rem;
+  margin: 0;
+  color: #ffffff;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.55);
+}
+
+.type-card p {
+  color: #dcdee2;
+  font-size: 0.92rem;
+  margin: 0;
+  flex: 1;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+}
+
+.type-cta {
+  margin-top: 0.5rem;
+  font-weight: 600;
+  color: var(--moon-accent);
+  font-size: 0.9rem;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+}
+
+.home-contact {
+  margin-top: 3.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2.2rem;
+  flex-wrap: wrap;
+}
+
+.home-contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--moon-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+.home-contact-link svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  flex-shrink: 0;
+}
+.home-ig-dot {
+  fill: currentColor;
+  stroke: none;
+}
+.home-contact-link:hover {
+  color: var(--moon-accent);
+}
+
+@media (max-width: 760px) {
+  .type-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .home-brand {
+    --brand-h: 60px;
+    gap: 0.7rem;
+  }
+  .home-brand-title {
+    white-space: normal;
+    font-size: 1.15rem;
+  }
+}
