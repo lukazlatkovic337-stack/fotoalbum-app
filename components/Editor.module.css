@@ -121,6 +121,7 @@
 }
 
 .pageThumbWrap {
+  position: relative;
   border: 2px solid transparent;
   border-radius: 10px;
   padding: 4px;
@@ -139,10 +140,30 @@
   background: #fff;
 }
 
-.coverThumbInner {
-  width: 62%;
-  margin: 0 auto;
+/* Dugme za brisanje razvoda — pojavljuje se samo na strane koje je
+   korisnik sam dodao (fiksnih 30 početnih strana ne mogu da se obrišu). */
+.deleteSpreadBtn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(35, 33, 29, 0.6);
+  color: #fff;
+  font-size: 0.65rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
 }
+.deleteSpreadBtn:hover {
+  background: #b3452a;
+  border-color: #b3452a;
+}
+
 .spreadThumbInner {
   display: flex;
   gap: 2px;
@@ -159,6 +180,21 @@
   text-align: center;
 }
 
+.addSpreadBtn {
+  margin-top: 0.9rem;
+  width: 100%;
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+  padding: 0.6rem;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  background: transparent;
+}
+.addSpreadBtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
+}
+
 /* ---------- Sredina: platno (workbook strane) ---------- */
 
 .stageArea {
@@ -171,10 +207,6 @@
   overflow-x: hidden;
   min-width: 0;
   min-height: 0;
-}
-
-.coverWrap {
-  width: min(440px, 100%);
 }
 
 .spreadWrap {
@@ -220,6 +252,17 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  pointer-events: none;
+}
+
+.sticker {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  user-select: none;
   pointer-events: none;
 }
 
@@ -316,13 +359,19 @@
   box-shadow: 0 0 4px rgba(184, 137, 90, 0.6);
 }
 
-/* Sandbox za snimanje strane u PDF — van vidnog polja, uvek u punoj
-   veličini, nezavisno od trenutnog prikaza u editoru. */
+/* Sandbox za snimanje celog razvoda u PDF — van vidnog polja, nezavisno
+   od trenutnog prikaza u editoru (širina se postavlja inline na razvod
+   unutra, bez razmaka između strana). */
 .exportSandbox {
   position: fixed;
   top: 0;
   left: -99999px;
-  width: 900px;
+}
+/* Senka i zaobljeni uglovi su samo ekranski "izgled kartice" u editoru —
+   u fajlu za štampu ne smeju da se vide, list mora biti čist pravougaonik. */
+.exportSandbox .stage {
+  box-shadow: none;
+  border-radius: 0;
 }
 
 /* ---------- Desno: alatke ---------- */
@@ -357,6 +406,7 @@
 
 .swatchRow {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.6rem;
 }
 .swatch {
@@ -385,12 +435,33 @@
   gap: 0.5rem;
 }
 
-.layoutRow {
+.stickerRow {
   display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.stickerBtn {
+  width: 40px;
+  height: 40px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #fff;
+}
+.stickerBtn:hover {
+  border-color: var(--color-primary);
+  background: #fbf3ea;
+}
+
+.layoutRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
 }
 .layoutBtn {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;

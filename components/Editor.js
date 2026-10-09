@@ -7,10 +7,12 @@ import {
   BACKGROUNDS,
   FONTS,
   PAGE_FORMAT_MM,
+  addContentSpread,
   backgroundsForType,
   buildAlbumViews,
   createDefaultAlbum,
   describeView,
+  removePages,
 } from "@/lib/albumConfig";
 import { uid } from "@/lib/id";
 import styles from "./Editor.module.css";
@@ -34,6 +36,36 @@ function clampElementBox(el) {
   const x = clamp(el.x, 0, 100 - w);
   const y = clamp(el.y, 0, 100 - h);
   return { ...el, w, h, x, y };
+}
+
+function round2(n) {
+  return Math.round(n * 100) / 100;
+}
+
+// Generiše niz pravougaonika za rasporede sa više slika (5–9) — slike su
+// raspoređene u redove sa zadatim brojem kolona po redu (npr. [3, 2] za 5
+// slika: 3 gore, 2 dole, centrirano), u istom stilu margina/razmaka kao i
+// ručno složeni rasporedi za 1–4 slike.
+function gridRects(rowCounts, margin = 6, gap = 4) {
+  const rows = rowCounts.length;
+  const fullWidth = 100 - margin * 2;
+  const cellH = (100 - margin * 2 - gap * (rows - 1)) / rows;
+  const rects = [];
+  rowCounts.forEach((cols, r) => {
+    // Svaki red nezavisno popunjava celu raspoloživu širinu — širina
+    // ćelije zavisi samo od broja kolona U TOM redu, tako da npr. 3
+    // ćelije u redu zauzimaju istu ukupnu širinu kao i 4 u redu iznad.
+    const cellW = (fullWidth - gap * (cols - 1)) / cols;
+    for (let c = 0; c < cols; c++) {
+      rects.push({
+        x: round2(margin + c * (cellW + gap)),
+        y: round2(margin + r * (cellH + gap)),
+        w: round2(cellW),
+        h: round2(cellH),
+      });
+    }
+  });
+  return rects;
 }
 
 // Gotovi rasporedi slika po strani — samo za unutrašnje strane (2–29),
@@ -98,7 +130,232 @@ const PHOTO_LAYOUTS = {
       ],
     },
   ],
+  5: [{ id: "grid-5", label: "5 slika (3+2)", rects: gridRects([3, 2]) }],
+  6: [{ id: "grid-6", label: "Mreža 3×2", rects: gridRects([3, 3]) }],
+  7: [
+    { id: "top-4", label: "4 gore, 3 dole", rects: gridRects([4, 3]) },
+    { id: "top-3", label: "3 gore, 4 dole", rects: gridRects([3, 4]) },
+  ],
+  8: [{ id: "grid-8", label: "Mreža 4×2", rects: gridRects([4, 4]) }],
+  9: [{ id: "grid-9", label: "Mreža 3×3", rects: gridRects([3, 3, 3]) }],
 };
+
+// Pravilna množina reči "slika" za brojeve 1–9 (1 = slika, 2–4 = slike,
+// 5–9 = slika — genitiv množine).
+function pluralSlika(count) {
+  if (count === 1) return "slika";
+  if (count >= 2 && count <= 4) return "slike";
+  return "slika";
+}
+
+// Ručno nacrtane SVG ilustracije za venčane stikere (umesto emoji znakova,
+// koji izgledaju različito od uređaja do uređaja) — svaka je u 0–100
+// koordinatnom sistemu i popunjava ceo kvadratni okvir elementa.
+function StickerRings() {
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <circle cx="36" cy="60" r="20" fill="none" stroke="#c9922c" strokeWidth="7" />
+      <circle cx="60" cy="60" r="20" fill="none" stroke="#e8c15a" strokeWidth="7" />
+      <path d="M60 30 L65 38 L60 46 L55 38 Z" fill="#bfe3ef" stroke="#8fc4d8" strokeWidth="1.5" />
+    </svg>
+  );
+}
+function StickerHearts() {
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <path
+        d="M50 78 C20 55 15 35 30 25 C40 19 50 27 50 35 C50 27 60 19 70 25 C85 35 80 55 50 78 Z"
+        fill="#e8779d"
+        transform="translate(-10,-6) scale(0.72)"
+      />
+      <path
+        d="M50 78 C20 55 15 35 30 25 C40 19 50 27 50 35 C50 27 60 19 70 25 C85 35 80 55 50 78 Z"
+        fill="#f3a9c4"
+        transform="translate(8,4) scale(0.72)"
+      />
+    </svg>
+  );
+}
+function StickerHeart() {
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <path
+        d="M50 82 C14 56 10 30 30 20 C42 14 50 24 50 34 C50 24 58 14 70 20 C90 30 86 56 50 82 Z"
+        fill="#e8577f"
+      />
+      <path
+        d="M34 30 C38 26 44 26 47 30"
+        fill="none"
+        stroke="#fff"
+        strokeWidth="4"
+        strokeLinecap="round"
+        opacity="0.6"
+      />
+    </svg>
+  );
+}
+function StickerBouquet() {
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <path d="M38 90 C40 72 42 60 44 52" stroke="#8a9a6b" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <path d="M50 90 C50 74 50 60 50 50" stroke="#8a9a6b" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <path d="M62 90 C60 72 58 60 56 52" stroke="#8a9a6b" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <circle cx="38" cy="36" r="13" fill="#f6c6d8" stroke="#e8a9c4" strokeWidth="1" />
+      <circle cx="62" cy="34" r="12" fill="#f3a9c4" stroke="#e0729b" strokeWidth="1" />
+      <circle cx="50" cy="48" r="14" fill="#e8779d" stroke="#d1527e" strokeWidth="1" />
+      <circle cx="26" cy="50" r="9" fill="#cfe0c4" stroke="#aec89a" strokeWidth="1" />
+      <circle cx="72" cy="48" r="9" fill="#cfe0c4" stroke="#aec89a" strokeWidth="1" />
+      <circle cx="38" cy="36" r="3" fill="#e8c15a" />
+      <circle cx="62" cy="34" r="3" fill="#e8c15a" />
+      <circle cx="50" cy="48" r="3.4" fill="#fff3d6" />
+      <path d="M42 76 C46 70 54 70 58 76 L54 88 C50 84 46 84 42 88 Z" fill="#c9922c" />
+      <path d="M50 76 L50 82" stroke="#9c7322" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+function StickerDove() {
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <path
+        d="M8 56 Q30 24 48 50 Q50 47 52 50 Q70 24 92 56 Q68 48 52 60 Q50 63 48 60 Q32 48 8 56 Z"
+        fill="#fdfdfb"
+        stroke="#b5ab98"
+        strokeWidth="2.5"
+      />
+      <ellipse cx="48" cy="62" rx="11" ry="9" fill="#fdfdfb" stroke="#b5ab98" strokeWidth="2.5" />
+      <circle cx="58" cy="55" r="7" fill="#fdfdfb" stroke="#b5ab98" strokeWidth="2.5" />
+      <path d="M64 54 L74 51 L65 59 Z" fill="#e8c15a" />
+      <circle cx="59" cy="52" r="1.6" fill="#2b2620" />
+      <path d="M40 66 L28 74 L38 64 Z" fill="#fdfdfb" stroke="#b5ab98" strokeWidth="2" />
+    </svg>
+  );
+}
+function StickerFlower() {
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <g stroke="#d1527e" strokeWidth="1.4">
+        <ellipse cx="50" cy="26" rx="13" ry="17" fill="#f3a9c4" />
+        <ellipse cx="50" cy="74" rx="13" ry="17" fill="#f3a9c4" transform="rotate(180 50 50)" />
+        <ellipse cx="26" cy="50" rx="13" ry="17" fill="#f6c6d8" transform="rotate(90 50 50)" />
+        <ellipse cx="74" cy="50" rx="13" ry="17" fill="#f6c6d8" transform="rotate(-90 50 50)" />
+        <ellipse cx="33" cy="33" rx="13" ry="17" fill="#f8d4e2" transform="rotate(45 33 33)" />
+      </g>
+      <circle cx="50" cy="50" r="11" fill="#e8c15a" stroke="#c9922c" strokeWidth="1.5" />
+    </svg>
+  );
+}
+function StickerChampagne() {
+  const glass = (
+    <>
+      <path
+        d="M30 20 L46 20 L43 46 C43 54 36 58 32 58 C28 58 21 54 21 46 Z"
+        fill="#cfe7ef"
+        stroke="#5e95a8"
+        strokeWidth="2.5"
+      />
+      <rect x="30" y="58" width="4" height="18" fill="#5e95a8" />
+      <rect x="22" y="76" width="20" height="4" rx="2" fill="#5e95a8" />
+      <path d="M24 26 L42 26" stroke="#e8c15a" strokeWidth="2" />
+    </>
+  );
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <g transform="translate(-10,0)">
+        {glass}
+        <circle cx="35" cy="36" r="1.6" fill="#fff" />
+        <circle cx="38" cy="44" r="1.3" fill="#fff" />
+      </g>
+      <g transform="translate(16,4)">
+        {glass}
+        <circle cx="35" cy="36" r="1.6" fill="#fff" />
+      </g>
+    </svg>
+  );
+}
+function StickerBottle() {
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <path d="M42 90 L40 42 Q40 30 50 22 Q60 30 60 42 L58 90 Z" fill="#e8c15a" />
+      <rect x="44" y="12" width="12" height="14" rx="2" fill="#2b2620" />
+      <path d="M30 28 Q24 20 30 14" stroke="#c9922c" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <path d="M70 28 Q76 20 70 14" stroke="#c9922c" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <ellipse cx="50" cy="42" rx="10" ry="5" fill="#f6dfa0" />
+    </svg>
+  );
+}
+function StickerCake() {
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <ellipse cx="50" cy="78" rx="34" ry="8" fill="#e8c15a" />
+      <rect x="20" y="58" width="60" height="20" rx="3" fill="#faf3e4" stroke="#e3d7c0" strokeWidth="2" />
+      <ellipse cx="50" cy="58" rx="30" ry="8" fill="#fffaf0" stroke="#e3d7c0" strokeWidth="2" />
+      <rect x="28" y="38" width="44" height="20" rx="3" fill="#faf3e4" stroke="#e3d7c0" strokeWidth="2" />
+      <ellipse cx="50" cy="38" rx="22" ry="7" fill="#fffaf0" stroke="#e3d7c0" strokeWidth="2" />
+      <path d="M50 36 C44 28 44 20 50 14 C56 20 56 28 50 36 Z" fill="#e8577f" />
+    </svg>
+  );
+}
+function StickerRibbon() {
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <path
+        d="M50 50 C50 50 20 35 20 20 C20 10 34 8 42 18 C46 24 50 34 50 34 C50 34 54 24 58 18 C66 8 80 10 80 20 C80 35 50 50 50 50 Z"
+        fill="#e8779d"
+      />
+      <path
+        d="M50 50 C50 50 20 65 20 80 C20 90 34 92 42 82 C46 76 50 66 50 66 C50 66 54 76 58 82 C66 92 80 90 80 80 C80 65 50 50 50 50 Z"
+        fill="#f3a9c4"
+      />
+      <circle cx="50" cy="50" r="7" fill="#c9922c" />
+    </svg>
+  );
+}
+function StickerBell() {
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <path
+        d="M50 14 C50 14 60 14 60 28 C72 32 78 44 78 58 L22 58 C22 44 28 32 40 28 C40 14 50 14 50 14 Z"
+        fill="#e8c15a"
+      />
+      <rect x="18" y="58" width="64" height="9" rx="4" fill="#c9922c" />
+      <circle cx="50" cy="76" r="8" fill="#c9922c" />
+      <path d="M38 22 Q50 10 62 22" stroke="#e8577f" strokeWidth="5" fill="none" strokeLinecap="round" />
+    </svg>
+  );
+}
+function StickerSparkles() {
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <g fill="#e8c15a">
+        <path d="M50 20 L55 42 L77 47 L55 52 L50 74 L45 52 L23 47 L45 42 Z" />
+        <path d="M78 18 L80 26 L88 28 L80 30 L78 38 L76 30 L68 28 L76 26 Z" />
+        <path d="M22 62 L24 68 L30 70 L24 72 L22 78 L20 72 L14 70 L20 68 Z" />
+      </g>
+    </svg>
+  );
+}
+
+// Dekorativni stikeri na temu venčanja — dodaju se kao poseban tip
+// elementa (referenca na ilustraciju po id-ju), mogu se slobodno pomerati i
+// menjati veličinu kao i tekst/slika. Dostupni su samo za album "vencanje".
+const WEDDING_STICKERS = [
+  { id: "rings", label: "Burme", Svg: StickerRings },
+  { id: "hearts", label: "Srca", Svg: StickerHearts },
+  { id: "heart", label: "Srce", Svg: StickerHeart },
+  { id: "bouquet", label: "Buket", Svg: StickerBouquet },
+  { id: "dove", label: "Golub", Svg: StickerDove },
+  { id: "flower", label: "Cvet", Svg: StickerFlower },
+  { id: "champagne", label: "Čaše", Svg: StickerChampagne },
+  { id: "bottle", label: "Šampanjac", Svg: StickerBottle },
+  { id: "cake", label: "Torta", Svg: StickerCake },
+  { id: "ribbon", label: "Mašna", Svg: StickerRibbon },
+  { id: "bell", label: "Zvono", Svg: StickerBell },
+  { id: "sparkles", label: "Sjaj", Svg: StickerSparkles },
+];
+
+function getStickerDef(id) {
+  return WEDDING_STICKERS.find((s) => s.id === id) || null;
+}
 
 function getLayoutVariant(count, variantId) {
   const variants = PHOTO_LAYOUTS[count] || [];
@@ -179,14 +436,17 @@ export default function Editor({ typeId }) {
   const [activePageId, setActivePageId] = useState(null);
   const [selectedElementId, setSelectedElementId] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
-  const [exportPage, setExportPage] = useState(null);
+  const [exportView, setExportView] = useState(null);
   // Da li je korisnik nešto izmenio u ovoj sesiji — ništa se ne čuva
   // između poseta, pa refresh/zatvaranje stranice vraća album na početak.
   const [isDirty, setIsDirty] = useState(false);
 
   const fileInputRef = useRef(null);
   const replaceTargetRef = useRef(null);
-  const exportStageRef = useRef(null);
+  const exportWrapRef = useRef(null);
+  // Prati prethodan broj strana, da bi se posle dodavanja novih strana
+  // (dugme "Dodaj još strana") editor automatski prebacio na novi razvod.
+  const prevPageCountRef = useRef(null);
 
   // Album uvek kreće od nule (tačno 30 praznih strana) — ništa se ne
   // učitava iz prethodnih poseta, namerno, po zahtevu: refresh stranice
@@ -198,7 +458,29 @@ export default function Editor({ typeId }) {
     setActivePageId(initial.pages[0]?.id ?? null);
     setSelectedElementId(null);
     setIsDirty(false);
+    prevPageCountRef.current = initial.pages.length;
   }, [typeId]);
+
+  // Kada broj strana promeni (dodat ili obrisan razvod), prilagodi
+  // trenutni pogled: ako su strane dodate, pređi na novi (poslednji)
+  // razvod; ako su obrisane, ostani na istom mestu u listi (ili na
+  // poslednjem validnom pogledu, ako je lista sad kraća).
+  useEffect(() => {
+    if (!album) return;
+    const count = album.pages.length;
+    const prevCount = prevPageCountRef.current;
+    if (prevCount !== null && count !== prevCount) {
+      const newViews = buildAlbumViews(album.pages);
+      const targetIdx =
+        count > prevCount
+          ? newViews.length - 1
+          : Math.min(selectedViewIndex, newViews.length - 1);
+      setSelectedViewIndex(targetIdx);
+      setActivePageId(album.pages[newViews[targetIdx].pageIndices[0]].id);
+      setSelectedElementId(null);
+    }
+    prevPageCountRef.current = count;
+  }, [album]);
 
   // Upozorenje pre napuštanja/osvežavanja stranice, ako ima neizmenjenih
   // izmena — pošto se ništa ne čuva, sve bi bilo izgubljeno.
@@ -256,6 +538,31 @@ export default function Editor({ typeId }) {
   function setAlbumBackground(bgId) {
     setIsDirty(true);
     setAlbum((prev) => ({ ...prev, background: bgId }));
+  }
+
+  // Dodaje još jedan razvod (2 nove A4 strane) na kraj albuma, odmah pre
+  // zadnje korice.
+  function addMorePages() {
+    setIsDirty(true);
+    setAlbum((prev) => ({ ...prev, pages: addContentSpread(prev.pages) }));
+  }
+
+  // Briše jedan razvod (2 strane) — samo ako su obe strane naknadno
+  // dodate (removable). Početnih 30 (fiksnih) strana se ne mogu obrisati.
+  function deleteSpread(view) {
+    if (!album) return;
+    const pagesInView = view.pageIndices.map((idx) => album.pages[idx]);
+    if (!pagesInView.every((p) => p.removable)) return;
+    if (
+      !window.confirm(
+        "Obrisati ovaj razvod (2 strane)? Sve slike i tekst na njemu će biti izgubljeni."
+      )
+    ) {
+      return;
+    }
+    setIsDirty(true);
+    const idsToRemove = pagesInView.map((p) => p.id);
+    setAlbum((prev) => ({ ...prev, pages: removePages(prev.pages, idsToRemove) }));
   }
 
   // Postavlja raspored slika (1/2/3/4, uz varijantu rasporeda za brojeve
@@ -357,6 +664,25 @@ export default function Editor({ typeId }) {
     });
   }
 
+  // Dodaje dekorativni stiker — podrazumevano centriran, pri dnu strane
+  // (ispod mesta gde obično idu slike), kao kvadratić bez obzira na format
+  // strane (A4/B4 nisu kvadratni, pa se visina računa prema odnosu strana).
+  function addStickerElement(stickerId) {
+    if (!activePage) return;
+    const [pw, ph] = PAGE_FORMAT_MM[activePage.format] || PAGE_FORMAT_MM.A4;
+    const wPct = 14;
+    const hPct = round2(wPct * (pw / ph));
+    addElement({
+      id: uid("el"),
+      type: "sticker",
+      stickerId,
+      x: round2((100 - wPct) / 2),
+      y: round2(100 - hPct - 6),
+      w: wPct,
+      h: hPct,
+    });
+  }
+
   function triggerAddPhoto() {
     replaceTargetRef.current = null;
     fileInputRef.current?.click();
@@ -433,6 +759,10 @@ export default function Editor({ typeId }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [selectedElementId, album]);
 
+  // 1cm bela margina sa svake strane svakog lista u PDF-u, za štampu i
+  // sečenje (ne utiče na sam editor, samo na izvezeni fajl).
+  const PDF_BLEED_MM = 10;
+
   async function handleExportPdf() {
     if (!album || isExporting) return;
     setIsExporting(true);
@@ -457,15 +787,24 @@ export default function Editor({ typeId }) {
         });
       }
 
-      const firstFormat = PAGE_FORMAT_MM[album.pages[0].format];
-      const doc = new jsPDF({ unit: "mm", format: firstFormat });
+      // Izvoz prati isti raspored kao editor: svaki razvod (korice ili dve
+      // strane) ide na JEDAN list u PDF-u — korice kao B3 (2×B4), ostali
+      // razvodi kao A3 (2×A4) — uz 1cm bele margine sa svake strane.
+      const exportViews = buildAlbumViews(album.pages);
+      let doc = null;
 
-      for (let i = 0; i < album.pages.length; i++) {
-        const page = album.pages[i];
-        const [w, h] = PAGE_FORMAT_MM[page.format];
-        setExportPage(page);
+      for (let i = 0; i < exportViews.length; i++) {
+        const view = exportViews[i];
+        const firstPage = album.pages[view.pageIndices[0]];
+        const [pw, ph] = PAGE_FORMAT_MM[firstPage.format] || PAGE_FORMAT_MM.A4;
+        const sheetW = pw * 2;
+        const sheetH = ph;
+        const pdfW = sheetW + PDF_BLEED_MM * 2;
+        const pdfH = sheetH + PDF_BLEED_MM * 2;
+
+        setExportView(view);
         await waitFrames(2);
-        const node = exportStageRef.current;
+        const node = exportWrapRef.current;
         if (!node) continue;
         await waitForImages(node);
         const canvas = await html2canvas(node, {
@@ -474,8 +813,13 @@ export default function Editor({ typeId }) {
           backgroundColor: "#ffffff",
         });
         const imgData = canvas.toDataURL("image/jpeg", 0.92);
-        if (i > 0) doc.addPage([w, h], "portrait");
-        doc.addImage(imgData, "JPEG", 0, 0, w, h);
+
+        if (!doc) {
+          doc = new jsPDF({ unit: "mm", format: [pdfW, pdfH], orientation: "landscape" });
+        } else {
+          doc.addPage([pdfW, pdfH], "landscape");
+        }
+        doc.addImage(imgData, "JPEG", PDF_BLEED_MM, PDF_BLEED_MM, sheetW, sheetH);
       }
 
       const safeTitle =
@@ -488,7 +832,7 @@ export default function Editor({ typeId }) {
       console.error(err);
       alert("Došlo je do greške prilikom izvoza u PDF. Pokušajte ponovo.");
     } finally {
-      setExportPage(null);
+      setExportView(null);
       setIsExporting(false);
     }
   }
@@ -534,7 +878,9 @@ export default function Editor({ typeId }) {
           >
             ‹
           </button>
-          <span className={styles.pageCounter}>{describeView(currentView)}</span>
+          <span className={styles.pageCounter}>
+            {describeView(currentView, album.pages.length)}
+          </span>
           <button
             type="button"
             onClick={() => goToView(selectedViewIndex + 1)}
@@ -557,54 +903,70 @@ export default function Editor({ typeId }) {
       <div className={styles.body}>
         <aside className={styles.pagesRail}>
           <div className={styles.pagesList}>
-            {views.map((view, vIdx) => (
-              <div
-                key={vIdx}
-                className={`${styles.pageThumbWrap} ${
-                  vIdx === selectedViewIndex ? styles.pageThumbActive : ""
-                }`}
-              >
-                <button
-                  type="button"
-                  className={styles.pageThumbBtn}
-                  onClick={() => goToView(vIdx)}
-                  aria-label={describeView(view)}
+            {views.map((view, vIdx) => {
+              const isRemovable = view.pageIndices.every(
+                (idx) => album.pages[idx].removable
+              );
+              return (
+                <div
+                  key={vIdx}
+                  className={`${styles.pageThumbWrap} ${
+                    vIdx === selectedViewIndex ? styles.pageThumbActive : ""
+                  }`}
                 >
-                  <div
-                    className={
-                      view.type === "cover" ? styles.coverThumbInner : styles.spreadThumbInner
-                    }
+                  <button
+                    type="button"
+                    className={styles.pageThumbBtn}
+                    onClick={() => goToView(vIdx)}
+                    aria-label={describeView(view, album.pages.length)}
                   >
-                    {view.pageIndices.map((idx) => (
-                      <Stage
-                        key={album.pages[idx].id}
-                        page={album.pages[idx]}
-                        pageIndex={idx}
-                        background={album.background}
-                        interactive={false}
-                      />
-                    ))}
+                    <div className={styles.spreadThumbInner}>
+                      {view.pageIndices.map((idx) => (
+                        <Stage
+                          key={album.pages[idx].id}
+                          page={album.pages[idx]}
+                          pageIndex={idx}
+                          background={album.background}
+                          interactive={false}
+                        />
+                      ))}
+                    </div>
+                  </button>
+                  {isRemovable && (
+                    <button
+                      type="button"
+                      className={styles.deleteSpreadBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteSpread(view);
+                      }}
+                      title="Obriši ovaj razvod"
+                      aria-label="Obriši ovaj razvod"
+                    >
+                      ✕
+                    </button>
+                  )}
+                  <div className={styles.pageThumbMeta}>
+                    <span>{describeView(view, album.pages.length)}</span>
                   </div>
-                </button>
-                <div className={styles.pageThumbMeta}>
-                  <span>{describeView(view)}</span>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
+          <button type="button" className={styles.addSpreadBtn} onClick={addMorePages}>
+            + Dodaj još 2 strane
+          </button>
         </aside>
 
         <main className={styles.stageArea}>
-          <div className={currentView.type === "cover" ? styles.coverWrap : styles.spreadWrap}>
+          <div className={styles.spreadWrap}>
             {currentView.pageIndices.map((idx) => {
               const page = album.pages[idx];
               return (
                 <div
                   key={page.id}
                   className={`${styles.pageSlot} ${
-                    currentView.pageIndices.length > 1 && activePageId === page.id
-                      ? styles.pageSlotActive
-                      : ""
+                    activePageId === page.id ? styles.pageSlotActive : ""
                   }`}
                 >
                   <Stage
@@ -661,15 +1023,15 @@ export default function Editor({ typeId }) {
             </div>
           </section>
 
-          {currentView.type === "spread" && (
+          {activePage.role === "content" && (
             <section className={styles.panelSection}>
               <h3>Raspored slika</h3>
               <p className={styles.hint}>
-                Koliko slika ide na stranu {activePageNumber}
-                {currentView.pageIndices.length > 1 ? " (kliknite na stranu da je izaberete)" : ""}.
+                Koliko slika ide na stranu {activePageNumber} (kliknite na stranu da je
+                izaberete).
               </p>
               <div className={styles.layoutRow}>
-                {[1, 2, 3, 4].map((count) => (
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((count) => (
                   <button
                     type="button"
                     key={count}
@@ -677,7 +1039,7 @@ export default function Editor({ typeId }) {
                       activePage.layout === count ? styles.layoutBtnActive : ""
                     }`}
                     onClick={() => setPageLayout(activePage.id, count)}
-                    title={`${count} ${count === 1 ? "slika" : "slike"} po strani`}
+                    title={`${count} ${pluralSlika(count)} po strani`}
                   >
                     <LayoutPreviewIcon rects={PHOTO_LAYOUTS[count][0].rects} />
                     <span>{count}</span>
@@ -688,7 +1050,7 @@ export default function Editor({ typeId }) {
               {activePage.layout && PHOTO_LAYOUTS[activePage.layout].length > 1 && (
                 <>
                   <p className={styles.hint} style={{ marginTop: "0.8rem" }}>
-                    Varijanta rasporeda za {activePage.layout} slike:
+                    Varijanta rasporeda za {activePage.layout} {pluralSlika(activePage.layout)}:
                   </p>
                   <div className={styles.layoutRow}>
                     {PHOTO_LAYOUTS[activePage.layout].map((variant) => (
@@ -713,8 +1075,7 @@ export default function Editor({ typeId }) {
           <section className={styles.panelSection}>
             <h3>Dodaj element</h3>
             <p className={styles.hint}>
-              Dodaje se na stranu {activePageNumber}
-              {currentView.pageIndices.length > 1 ? " (kliknite na stranu da je izaberete)" : ""}.
+              Dodaje se na stranu {activePageNumber} (kliknite na stranu da je izaberete).
             </p>
             <div className={styles.addRow}>
               <button type="button" className="btn-ghost" onClick={addTextElement}>
@@ -732,6 +1093,28 @@ export default function Editor({ typeId }) {
               onChange={handleFileChange}
             />
           </section>
+
+          {typeId === "vencanje" && (
+            <section className={styles.panelSection}>
+              <h3>Stikeri</h3>
+              <p className={styles.hint}>
+                Dekoracija na temu venčanja — dodaje se na stranu {activePageNumber}.
+              </p>
+              <div className={styles.stickerRow}>
+                {WEDDING_STICKERS.map((s) => (
+                  <button
+                    type="button"
+                    key={s.id}
+                    className={styles.stickerBtn}
+                    onClick={() => addStickerElement(s.id)}
+                    title={s.label}
+                  >
+                    <s.Svg />
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
 
           {selectedElement && selectedElement.type === "text" && (
             <section className={styles.panelSection}>
@@ -857,15 +1240,26 @@ export default function Editor({ typeId }) {
         </aside>
       </div>
 
-      {exportPage && (
+      {exportView && (
         <div className={styles.exportSandbox} aria-hidden>
-          <Stage
-            page={exportPage}
-            pageIndex={album.pages.findIndex((p) => p.id === exportPage.id)}
-            background={album.background}
-            interactive={false}
-            stageRef={exportStageRef}
-          />
+          {/* Ceo razvod se renderuje zajedno (bez razmaka) da bi se snimio
+              kao jedan list — isto kao što će izgledati odštampan. */}
+          <div
+            ref={exportWrapRef}
+            className={styles.spreadWrap}
+            style={{ width: "1600px", gap: 0 }}
+          >
+            {exportView.pageIndices.map((idx) => (
+              <div key={album.pages[idx].id} className={styles.pageSlot}>
+                <Stage
+                  page={album.pages[idx]}
+                  pageIndex={idx}
+                  background={album.background}
+                  interactive={false}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -1057,6 +1451,13 @@ function StageElement({
             <span className={styles.emptySlotLabel}>Dodaj sliku</span>
           </div>
         )
+      ) : el.type === "sticker" ? (
+        <div className={styles.sticker}>
+          {(() => {
+            const def = getStickerDef(el.stickerId);
+            return def ? <def.Svg /> : null;
+          })()}
+        </div>
       ) : (
         <div
           ref={textRef}
