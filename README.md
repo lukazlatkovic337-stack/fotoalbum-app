@@ -1,7 +1,7 @@
-# FotoAlbum – kreator foto albuma
+# MakeBook – kreator foto albuma
 
 Web sajt za kreiranje personalizovanih foto albuma za tri prilike:
-venčanje, krštenje i prvi rođendan.
+venčanje, 18. rođendan i prvi rođendan.
 
 ## Kako radi
 

@@ -23,9 +23,9 @@ const fontScript = Dancing_Script({
 });
 
 export const metadata = {
-  title: "FotoAlbum – kreirajte svoj foto album",
+  title: "MakeBook – kreirajte svoj foto album",
   description:
-    "Napravite personalizovan foto album za venčanje, krštenje ili prvi rođendan i izvezite ga u PDF, spreman za štampu.",
+    "Napravite personalizovan foto album za venčanje, 18. rođendan ili prvi rođendan i izvezite ga u PDF, spreman za štampu.",
 };
 
 export default function RootLayout({ children }) {

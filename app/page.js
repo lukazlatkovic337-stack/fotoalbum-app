@@ -15,12 +15,12 @@ export default function Home() {
           <div className="home-brand">
             <img src="/logo.png" alt="Moonlight Studio" className="home-logo" />
             <div className="home-brand-text">
-              <h1 className="home-brand-title">Moonlight foto studio</h1>
+              <h1 className="home-brand-title">MakeBook</h1>
               <p className="home-brand-subtitle">Izrada foto albuma</p>
             </div>
           </div>
           <p>
-            Dobrodošli u Moonlight foto studio! Kreirajte svoj personalizovani foto album i sačuvajte svoje dragocene uspomene zauvek. Naš studio nudi širok spektar opcija za izradu foto albuma, od klasičnih do modernih dizajna, kako biste mogli da izrazite svoju kreativnost i stil.
+            Kreirajte svoj personalizovani foto album i sačuvajte svoje dragocene uspomene zauvek. Naš studio nudi širok spektar opcija za izradu foto albuma, od klasičnih do modernih dizajna, kako biste mogli da izrazite svoju kreativnost i stil.
           </p>
         </section>
 

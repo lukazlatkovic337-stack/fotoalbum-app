@@ -255,6 +255,14 @@
   pointer-events: none;
 }
 
+/* Tamni preliv preko slike, da tekst preko nje ostane čitljiv. */
+.photoDarken {
+  position: absolute;
+  inset: 0;
+  background: #000000;
+  pointer-events: none;
+}
+
 .sticker {
   width: 100%;
   height: 100%;
@@ -432,7 +440,11 @@
 
 .addRow {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
+}
+.addRow > * {
+  flex: 1 1 auto;
 }
 
 .stickerRow {
@@ -500,6 +512,52 @@
 }
 .layoutBtnActive .layoutIconRect {
   opacity: 0.75;
+}
+
+.coverStyleRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+}
+.coverStyleBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.72rem;
+  line-height: 1.2;
+  color: var(--color-muted);
+  text-align: center;
+}
+.coverStyleBtn:hover {
+  border-color: var(--color-primary);
+}
+.coverStyleBtnActive {
+  border-color: var(--color-primary);
+  background: #fbf3ea;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+.coverStyleIcon {
+  position: relative;
+  display: block;
+  width: 42px;
+  height: 58px;
+  border-radius: 4px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.coverStyleIcon > span {
+  position: absolute;
+}
+.coverIconPhoto {
+  background: #cfc6b4;
 }
 
 .fontRow {

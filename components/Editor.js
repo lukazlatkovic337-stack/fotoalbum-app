@@ -31,8 +31,11 @@ const CENTER_SNAP = 1.5;
 // strane — bez obzira da li je promena došla iz pomeranja, promene
 // veličine ili nekog drugog izvora.
 function clampElementBox(el) {
-  const w = clamp(el.w, 6, 100);
-  const h = clamp(el.h, 6, 100);
+  // Trake (shape) smeju biti mnogo tanje od ostalih elemenata — koriste se i
+  // kao tanke ukrasne linije (razdelnici), ne samo kao pune pozadinske trake.
+  const minSize = el.type === "shape" ? 0.3 : 6;
+  const w = clamp(el.w, minSize, 100);
+  const h = clamp(el.h, minSize, 100);
   const x = clamp(el.x, 0, 100 - w);
   const y = clamp(el.y, 0, 100 - h);
   return { ...el, w, h, x, y };
@@ -335,6 +338,163 @@ function StickerSparkles() {
   );
 }
 
+// Gotovi dizajni korice za venčanje — klik postavlja kompletan raspored
+// (fotografija + trake + stilizovan tekst) na trenutnu koricu odjednom;
+// korisnik posle samo zameni sliku i upiše svoja imena/datum. Dostupno
+// samo za album "vencanje" i samo na koricama (ne na unutrašnjim stranama).
+const COVER_STYLES = [
+  {
+    id: "vintage",
+    label: "Vintage sa ukrasom",
+    elements: [
+      { type: "photo", src: null, x: 0, y: 0, w: 100, h: 100 },
+      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#ffffff", opacity: 0.38 },
+      {
+        type: "text",
+        text: "VENČANJE",
+        x: 8, y: 7, w: 84, h: 6,
+        fontId: "modern", fontSizePct: 2.4, align: "center",
+        color: "#2b2620", bold: false, italic: false, letterSpacing: 0.4,
+      },
+      {
+        type: "text",
+        text: "{",
+        x: 6, y: 40, w: 14, h: 20,
+        fontId: "elegant", fontSizePct: 13, align: "center",
+        color: "#2b2620", bold: false, italic: false,
+      },
+      {
+        type: "text",
+        text: "Ime & Ime",
+        x: 18, y: 44, w: 64, h: 14,
+        fontId: "elegant", fontSizePct: 7.5, align: "center",
+        color: "#2b2620", bold: true, italic: false,
+      },
+      {
+        type: "text",
+        text: "}",
+        x: 80, y: 40, w: 14, h: 20,
+        fontId: "elegant", fontSizePct: 13, align: "center",
+        color: "#2b2620", bold: false, italic: false,
+      },
+      {
+        type: "text",
+        text: "SAČUVAJTE DATUM",
+        x: 8, y: 87, w: 84, h: 6,
+        fontId: "modern", fontSizePct: 2.1, align: "center",
+        color: "#2b2620", bold: false, italic: false, letterSpacing: 0.35,
+      },
+    ],
+  },
+  {
+    id: "card",
+    label: "Ravna kartica",
+    elements: [
+      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#faf6ee", opacity: 1 },
+      {
+        type: "text",
+        text: "IME & IME",
+        x: 8, y: 7, w: 84, h: 9,
+        fontId: "modern", fontSizePct: 4.4, align: "center",
+        color: "#2b2620", bold: true, italic: false, letterSpacing: 0.3,
+      },
+      { type: "photo", src: null, x: 10, y: 20, w: 80, h: 54 },
+      { type: "shape", x: 10, y: 74.4, w: 80, h: 0.6, color: "#b8895a", opacity: 1 },
+      {
+        type: "text",
+        text: "DD . MM . GODINA",
+        x: 20, y: 80, w: 60, h: 6,
+        fontId: "elegant", fontSizePct: 3, align: "center",
+        color: "#6b6052", bold: false, italic: false, letterSpacing: 0.2,
+      },
+      {
+        type: "text",
+        text: "VENČANJE",
+        x: 20, y: 89, w: 60, h: 5,
+        fontId: "modern", fontSizePct: 2.1, align: "center",
+        color: "#b8895a", bold: false, italic: false, letterSpacing: 0.35,
+      },
+    ],
+  },
+  {
+    id: "script",
+    label: "Rukopis i fotografija",
+    elements: [
+      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#faf6ee", opacity: 1 },
+      {
+        type: "text",
+        text: "Ime & Ime",
+        x: 4, y: 4, w: 92, h: 15,
+        fontId: "script", fontSizePct: 9, align: "center",
+        color: "#2b2620", bold: false, italic: false,
+      },
+      { type: "shape", x: 18, y: 20.5, w: 27, h: 0.4, color: "#b8895a", opacity: 1 },
+      {
+        type: "text",
+        text: "◆",
+        x: 46, y: 18.5, w: 8, h: 4,
+        fontId: "elegant", fontSizePct: 2.4, align: "center",
+        color: "#b8895a", bold: false, italic: false,
+      },
+      { type: "shape", x: 55, y: 20.5, w: 27, h: 0.4, color: "#b8895a", opacity: 1 },
+      { type: "photo", src: null, x: 0, y: 25, w: 100, h: 75 },
+      { type: "shape", x: 30, y: 89, w: 40, h: 7, color: "#15171a", opacity: 0.55 },
+      {
+        type: "text",
+        text: "VENČANJE",
+        x: 30, y: 90.6, w: 40, h: 4,
+        fontId: "modern", fontSizePct: 2, align: "center",
+        color: "#ffffff", bold: false, italic: false, letterSpacing: 0.3,
+      },
+    ],
+  },
+  {
+    id: "darkened",
+    label: "Zatamnjena fotografija",
+    elements: [
+      { type: "photo", src: null, x: 0, y: 0, w: 100, h: 100, darken: 0.45 },
+      {
+        type: "text",
+        text: "Ime + Ime",
+        x: 6, y: 40, w: 88, h: 16,
+        fontId: "elegant", fontSizePct: 9, align: "center",
+        color: "#ffffff", bold: true, italic: false,
+      },
+      { type: "shape", x: 0, y: 88, w: 100, h: 12, color: "#15171a", opacity: 0.8 },
+      {
+        type: "text",
+        text: "DD . MM . GODINA · MESTO",
+        x: 8, y: 91.5, w: 84, h: 6,
+        fontId: "modern", fontSizePct: 2.2, align: "center",
+        color: "#ffffff", bold: false, italic: false, letterSpacing: 0.3,
+      },
+    ],
+  },
+  {
+    id: "minimal",
+    label: "Minimalistički potpis",
+    elements: [
+      { type: "photo", src: null, x: 0, y: 0, w: 100, h: 100, darken: 0.2 },
+      {
+        type: "text",
+        text: "Ime & Ime",
+        x: 4, y: 8, w: 92, h: 15,
+        fontId: "script", fontSizePct: 8.5, align: "center",
+        color: "#ffffff", bold: false, italic: false,
+      },
+      { type: "shape", x: 35, y: 24, w: 30, h: 0.4, color: "#ffffff", opacity: 0.9 },
+      { type: "shape", x: 25, y: 86, w: 50, h: 7, color: "#ffffff", opacity: 0.18 },
+      {
+        type: "text",
+        text: "SAČUVAJTE DATUM",
+        x: 25, y: 87.6, w: 50, h: 4,
+        fontId: "modern", fontSizePct: 1.9, align: "center",
+        color: "#ffffff", bold: false, italic: false, letterSpacing: 0.3,
+      },
+    ],
+  },
+];
+
 // Dekorativni stikeri na temu venčanja — dodaju se kao poseban tip
 // elementa (referenca na ilustraciju po id-ju), mogu se slobodno pomerati i
 // menjati veličinu kao i tekst/slika. Dostupni su samo za album "vencanje".
@@ -535,9 +695,20 @@ export default function Editor({ typeId }) {
     setActivePageId(pageId);
   }
 
-  function setAlbumBackground(bgId) {
+  // Tema se bira po razvodu — menja obe strane trenutnog pogleda odjednom
+  // (da bi slikovne teme, koje se prelivaju preko oba, ostale celovite).
+  function setSpreadBackground(bgId) {
+    if (!currentView) return;
     setIsDirty(true);
-    setAlbum((prev) => ({ ...prev, background: bgId }));
+    const idsInView = new Set(
+      currentView.pageIndices.map((idx) => album.pages[idx].id)
+    );
+    setAlbum((prev) => ({
+      ...prev,
+      pages: prev.pages.map((p) =>
+        idsInView.has(p.id) ? { ...p, background: bgId } : p
+      ),
+    }));
   }
 
   // Dodaje još jedan razvod (2 nove A4 strane) na kraj albuma, odmah pre
@@ -664,6 +835,54 @@ export default function Editor({ typeId }) {
     });
   }
 
+  // Dodaje jednobojnu traku (pravougaonik) — korisno kao podloga iza
+  // teksta na fotografiji, da tekst ostane čitljiv bez obzira na sliku.
+  function addShapeElement(overrides = {}) {
+    if (!activePage) return;
+    addElement({
+      id: uid("el"),
+      type: "shape",
+      x: 10,
+      y: 80,
+      w: 80,
+      h: 12,
+      color: "#000000",
+      opacity: 0.4,
+      ...overrides,
+    });
+  }
+
+  // Primenjuje gotov dizajn korice — zamenjuje sve elemente koje je postavio
+  // PRETHODNI stil korice (ako postoji) novim rasporedom (fotografija +
+  // trake + tekst). Ručno dodati elementi (preko "Dodaj element") ostaju
+  // netaknuti. Ponovni klik na već izabran stil ne radi ništa.
+  function applyCoverStyle(styleId) {
+    if (!activePage) return;
+    if (activePage.coverStyle === styleId) return;
+    const style = COVER_STYLES.find((s) => s.id === styleId);
+    if (!style) return;
+
+    const hasExisting = activePage.elements.some((e) => e.coverStyleSlot);
+    if (
+      hasExisting &&
+      !window.confirm(
+        "Menjanje stila korice će ukloniti tekst/sliku postavljene trenutnim stilom. Nastaviti?"
+      )
+    ) {
+      return;
+    }
+
+    const newEls = style.elements.map((tpl) =>
+      clampElementBox({ id: uid("el"), coverStyleSlot: true, ...tpl })
+    );
+    updatePage(activePage.id, (p) => ({
+      ...p,
+      coverStyle: styleId,
+      elements: [...newEls, ...p.elements.filter((e) => !e.coverStyleSlot)],
+    }));
+    setSelectedElementId(null);
+  }
+
   // Dodaje dekorativni stiker — podrazumevano centriran, pri dnu strane
   // (ispod mesta gde obično idu slike), kao kvadratić bez obzira na format
   // strane (A4/B4 nisu kvadratni, pa se visina računa prema odnosu strana).
@@ -775,21 +994,10 @@ export default function Editor({ typeId }) {
       ]);
       const html2canvas = html2canvasModule.default;
 
-      // Ako je izabrana slikovna tema, sačekaj da se slika učita (uđe u
-      // keš) pre nego što html2canvas počne da snima strane.
-      const bgDef = getBackground(album.background);
-      if (bgDef.image) {
-        await new Promise((res) => {
-          const img = new Image();
-          img.onload = res;
-          img.onerror = res;
-          img.src = bgDef.image;
-        });
-      }
-
       // Izvoz prati isti raspored kao editor: svaki razvod (korice ili dve
       // strane) ide na JEDAN list u PDF-u — korice kao B3 (2×B4), ostali
-      // razvodi kao A3 (2×A4) — uz 1cm bele margine sa svake strane.
+      // razvodi kao A3 (2×A4) — uz 1cm bele margine sa svake strane. Svaki
+      // razvod može imati svoju temu, pa se slika učitava po razvodu.
       const exportViews = buildAlbumViews(album.pages);
       let doc = null;
 
@@ -801,6 +1009,18 @@ export default function Editor({ typeId }) {
         const sheetH = ph;
         const pdfW = sheetW + PDF_BLEED_MM * 2;
         const pdfH = sheetH + PDF_BLEED_MM * 2;
+
+        // Ako je ovaj razvod na slikovnoj temi, sačekaj da se slika učita
+        // (uđe u keš) pre nego što html2canvas počne da ga snima.
+        const bgDef = getBackground(firstPage.background);
+        if (bgDef.image) {
+          await new Promise((res) => {
+            const img = new Image();
+            img.onload = res;
+            img.onerror = res;
+            img.src = bgDef.image;
+          });
+        }
 
         setExportView(view);
         await waitFrames(2);
@@ -926,7 +1146,6 @@ export default function Editor({ typeId }) {
                           key={album.pages[idx].id}
                           page={album.pages[idx]}
                           pageIndex={idx}
-                          background={album.background}
                           interactive={false}
                         />
                       ))}
@@ -972,7 +1191,6 @@ export default function Editor({ typeId }) {
                   <Stage
                     page={page}
                     pageIndex={idx}
-                    background={album.background}
                     interactive
                     selectedElementId={isExporting ? null : selectedElementId}
                     isExporting={isExporting}
@@ -998,10 +1216,11 @@ export default function Editor({ typeId }) {
 
         <aside className={styles.panel}>
           <section className={styles.panelSection}>
-            <h3>Tema albuma</h3>
+            <h3>Tema stranice</h3>
             <p className={styles.hint}>
-              Dostupne teme: {availableBackgrounds.length}. Primenjuje se na ceo
-              album{hasImageThemes ? "; dekorativne teme pokrivaju strane 2–29" : ""}.
+              Dostupne teme: {availableBackgrounds.length}. Primenjuje se na obe
+              strane ovog razvoda ({describeView(currentView, album.pages.length)})
+              {hasImageThemes ? "; dekorativne teme pokrivaju strane 2–29" : ""}.
             </p>
             <div className={styles.swatchRow}>
               {availableBackgrounds.map((bg) => (
@@ -1009,13 +1228,13 @@ export default function Editor({ typeId }) {
                   type="button"
                   key={bg.id}
                   className={`${styles.swatch} ${
-                    album.background === bg.id ? styles.swatchActive : ""
+                    activePage.background === bg.id ? styles.swatchActive : ""
                   }`}
                   style={bg.swatchStyle || bg.style}
-                  onClick={() => setAlbumBackground(bg.id)}
+                  onClick={() => setSpreadBackground(bg.id)}
                   title={bg.label}
                 >
-                  {album.background === bg.id && (
+                  {activePage.background === bg.id && (
                     <span className={styles.swatchCheck}>✓</span>
                   )}
                 </button>
@@ -1072,6 +1291,30 @@ export default function Editor({ typeId }) {
             </section>
           )}
 
+          {typeId === "vencanje" && activePage.role !== "content" && (
+            <section className={styles.panelSection}>
+              <h3>Stil korice</h3>
+              <p className={styles.hint}>
+                Gotov dizajn korice — posle izbora samo zamenite sliku i upišite imena.
+              </p>
+              <div className={styles.coverStyleRow}>
+                {COVER_STYLES.map((s) => (
+                  <button
+                    type="button"
+                    key={s.id}
+                    className={`${styles.coverStyleBtn} ${
+                      activePage.coverStyle === s.id ? styles.coverStyleBtnActive : ""
+                    }`}
+                    onClick={() => applyCoverStyle(s.id)}
+                  >
+                    <CoverStylePreviewIcon elements={s.elements} />
+                    <span>{s.label}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+
           <section className={styles.panelSection}>
             <h3>Dodaj element</h3>
             <p className={styles.hint}>
@@ -1083,6 +1326,9 @@ export default function Editor({ typeId }) {
               </button>
               <button type="button" className="btn-ghost" onClick={triggerAddPhoto}>
                 + Slika
+              </button>
+              <button type="button" className="btn-ghost" onClick={() => addShapeElement()}>
+                + Traka
               </button>
             </div>
             <input
@@ -1207,6 +1453,58 @@ export default function Editor({ typeId }) {
               >
                 Zameni sliku
               </button>
+              <label className={styles.fieldLabel}>
+                Zatamnjenost
+                <input
+                  type="range"
+                  min="0"
+                  max="0.85"
+                  step="0.05"
+                  value={selectedElement.darken ?? 0}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, {
+                      darken: parseFloat(e.target.value),
+                    })
+                  }
+                />
+              </label>
+              <p className={styles.hint}>
+                Zatamni sliku da tekst preko nje ostane čitljiv.
+              </p>
+            </section>
+          )}
+
+          {selectedElement && selectedElement.type === "shape" && (
+            <section className={styles.panelSection}>
+              <h3>Traka</h3>
+              <p className={styles.hint}>
+                Jednobojna podloga — korisno iza teksta, da ostane čitljiv na slici.
+              </p>
+              <label className={styles.fieldLabel}>
+                Boja
+                <input
+                  type="color"
+                  value={selectedElement.color}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, { color: e.target.value })
+                  }
+                />
+              </label>
+              <label className={styles.fieldLabel}>
+                Providnost
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={selectedElement.opacity ?? 1}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, {
+                      opacity: parseFloat(e.target.value),
+                    })
+                  }
+                />
+              </label>
             </section>
           )}
 
@@ -1254,7 +1552,6 @@ export default function Editor({ typeId }) {
                 <Stage
                   page={album.pages[idx]}
                   pageIndex={idx}
-                  background={album.background}
                   interactive={false}
                 />
               </div>
@@ -1269,7 +1566,6 @@ export default function Editor({ typeId }) {
 function Stage({
   page,
   pageIndex,
-  background,
   interactive,
   stageRef,
   selectedElementId,
@@ -1279,7 +1575,7 @@ function Stage({
   onDeselect,
   onRequestPhoto,
 }) {
-  const bgStyle = pageBackgroundStyle(background, page, pageIndex);
+  const bgStyle = pageBackgroundStyle(page.background, page, pageIndex);
   const [w, h] = PAGE_FORMAT_MM[page.format] || PAGE_FORMAT_MM.A4;
   // Vodilje centra strane — prikazuju se samo dok se element aktivno
   // pomera (mode "move"), da bi se videlo gde je centar strane.
@@ -1444,7 +1740,15 @@ function StageElement({
     >
       {el.type === "photo" ? (
         el.src ? (
-          <img src={el.src} alt="" draggable={false} className={styles.photo} />
+          <>
+            <img src={el.src} alt="" draggable={false} className={styles.photo} />
+            {el.darken > 0 && (
+              <div
+                className={styles.photoDarken}
+                style={{ opacity: el.darken }}
+              />
+            )}
+          </>
         ) : (
           <div className={styles.emptySlot} data-empty-slot>
             <span className={styles.emptySlotPlus}>+</span>
@@ -1458,6 +1762,15 @@ function StageElement({
             return def ? <def.Svg /> : null;
           })()}
         </div>
+      ) : el.type === "shape" ? (
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            backgroundColor: el.color,
+            opacity: el.opacity ?? 1,
+          }}
+        />
       ) : (
         <div
           ref={textRef}
@@ -1473,6 +1786,7 @@ function StageElement({
             fontWeight: el.bold ? 700 : 400,
             fontStyle: el.italic ? "italic" : "normal",
             textAlign: el.align,
+            letterSpacing: el.letterSpacing ? `${el.letterSpacing}em` : "normal",
             userSelect: editing ? "text" : "none",
           }}
         >
@@ -1498,6 +1812,64 @@ function LayoutPreviewIcon({ rects }) {
           style={{ left: `${r.x}%`, top: `${r.y}%`, width: `${r.w}%`, height: `${r.h}%` }}
         />
       ))}
+    </span>
+  );
+}
+
+// Mala vizuelna ikonica u panelu koja pokazuje grub raspored jednog stila
+// korice: fotografija (sivo), trake (u svojoj boji), tekst (tanka traka u
+// svojoj boji, sa minimalnom visinom da se vidi i na ovoj veličini).
+function CoverStylePreviewIcon({ elements }) {
+  return (
+    <span className={styles.coverStyleIcon}>
+      {elements.map((el, i) => {
+        if (el.type === "photo") {
+          return (
+            <span
+              key={i}
+              className={styles.coverIconPhoto}
+              style={{
+                left: `${el.x}%`,
+                top: `${el.y}%`,
+                width: `${el.w}%`,
+                height: `${el.h}%`,
+                boxShadow: el.darken
+                  ? `inset 0 0 0 999px rgba(0,0,0,${el.darken})`
+                  : "none",
+              }}
+            />
+          );
+        }
+        if (el.type === "shape") {
+          return (
+            <span
+              key={i}
+              style={{
+                left: `${el.x}%`,
+                top: `${el.y}%`,
+                width: `${el.w}%`,
+                height: `${el.h}%`,
+                background: el.color,
+                opacity: el.opacity ?? 1,
+              }}
+            />
+          );
+        }
+        const h = Math.max(el.h, 9);
+        return (
+          <span
+            key={i}
+            style={{
+              left: `${el.x}%`,
+              top: `${el.y}%`,
+              width: `${el.w}%`,
+              height: `${h}%`,
+              background: el.color,
+              borderRadius: "1px",
+            }}
+          />
+        );
+      })}
     </span>
   );
 }
