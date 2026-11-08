@@ -342,154 +342,217 @@ function StickerSparkles() {
 // (fotografija + trake + stilizovan tekst) na trenutnu koricu odjednom;
 // korisnik posle samo zameni sliku i upiše svoja imena/datum. Dostupno
 // samo za album "vencanje" i samo na koricama (ne na unutrašnjim stranama).
+// Ovih 6 stilova su namerno "kopije" (raspored teksta/slike, boje, fontovi)
+// šest referentnih dizajna korica koje je poslao korisnik — nisu smišljene
+// od nule, već vernо prate tačno te primere (naziv "Tema 1" ... "Tema 6"
+// odgovara redosledu u kom su te slike poslate).
 const COVER_STYLES = [
+  // Tema 1 — "Jessica & Darren": bledo isprana fotografija cveća, gornji i
+  // donji sitni natpis velikim slovima, u sredini ime/i razdvojeno sa "&"
+  // uokvireno velikim vitičastim zagradama.
   {
-    id: "vintage",
-    label: "Vintage sa ukrasom",
+    id: "tema1",
+    label: "Tema 1",
     elements: [
       { type: "photo", src: null, x: 0, y: 0, w: 100, h: 100 },
-      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#ffffff", opacity: 0.38 },
       {
         type: "text",
-        text: "VENČANJE",
-        x: 8, y: 7, w: 84, h: 6,
-        fontId: "modern", fontSizePct: 2.4, align: "center",
-        color: "#2b2620", bold: false, italic: false, letterSpacing: 0.4,
+        text: "THE WEDDING",
+        x: 8, y: 7, w: 84, h: 5,
+        fontId: "modern", fontSizePct: 2.3, align: "center",
+        color: "#2b2e38", bold: false, italic: false, letterSpacing: 0.35,
       },
       {
         type: "text",
         text: "{",
-        x: 6, y: 40, w: 14, h: 20,
-        fontId: "elegant", fontSizePct: 13, align: "center",
-        color: "#2b2620", bold: false, italic: false,
+        x: 6, y: 39, w: 12, h: 22,
+        fontId: "elegant", fontSizePct: 16, align: "center",
+        color: "#20232b", bold: false, italic: false,
       },
       {
         type: "text",
-        text: "Ime & Ime",
-        x: 18, y: 44, w: 64, h: 14,
-        fontId: "elegant", fontSizePct: 7.5, align: "center",
-        color: "#2b2620", bold: true, italic: false,
+        text: "Jessica",
+        x: 18, y: 38, w: 64, h: 9,
+        fontId: "modern", fontSizePct: 7.4, align: "center",
+        color: "#1b1e24", bold: true, italic: false,
+      },
+      {
+        type: "text",
+        text: "&",
+        x: 18, y: 48, w: 64, h: 5,
+        fontId: "modern", fontSizePct: 3.2, align: "center",
+        color: "#1b1e24", bold: false, italic: false,
+      },
+      {
+        type: "text",
+        text: "Darren",
+        x: 18, y: 54, w: 64, h: 9,
+        fontId: "modern", fontSizePct: 7.4, align: "center",
+        color: "#1b1e24", bold: true, italic: false,
       },
       {
         type: "text",
         text: "}",
-        x: 80, y: 40, w: 14, h: 20,
-        fontId: "elegant", fontSizePct: 13, align: "center",
-        color: "#2b2620", bold: false, italic: false,
+        x: 82, y: 39, w: 12, h: 22,
+        fontId: "elegant", fontSizePct: 16, align: "center",
+        color: "#20232b", bold: false, italic: false,
       },
       {
         type: "text",
-        text: "SAČUVAJTE DATUM",
-        x: 8, y: 87, w: 84, h: 6,
+        text: "SAVE THE DATE",
+        x: 8, y: 88, w: 84, h: 5,
         fontId: "modern", fontSizePct: 2.1, align: "center",
-        color: "#2b2620", bold: false, italic: false, letterSpacing: 0.35,
+        color: "#2b2e38", bold: false, italic: false, letterSpacing: 0.35,
       },
     ],
   },
+  // Tema 2 — "Karina & Andrew": naslov velikim slovima pri vrhu, uramljena
+  // fotografija ispod (ne preko cele strane), tanka narandžasta linija i
+  // datum na dnu.
   {
-    id: "card",
-    label: "Ravna kartica",
+    id: "tema2",
+    label: "Tema 2",
     elements: [
-      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#faf6ee", opacity: 1 },
+      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#eef3f5", opacity: 1 },
       {
         type: "text",
-        text: "IME & IME",
-        x: 8, y: 7, w: 84, h: 9,
-        fontId: "modern", fontSizePct: 4.4, align: "center",
-        color: "#2b2620", bold: true, italic: false, letterSpacing: 0.3,
+        text: "KARINA & ANDREW",
+        x: 8, y: 6, w: 84, h: 8,
+        fontId: "modern", fontSizePct: 4.2, align: "center",
+        color: "#1f2a33", bold: true, italic: false, letterSpacing: 0.25,
       },
-      { type: "photo", src: null, x: 10, y: 20, w: 80, h: 54 },
-      { type: "shape", x: 10, y: 74.4, w: 80, h: 0.6, color: "#b8895a", opacity: 1 },
+      { type: "photo", src: null, x: 10, y: 20, w: 80, h: 52 },
+      { type: "shape", x: 10, y: 72.2, w: 80, h: 0.8, color: "#e2672c", opacity: 1 },
+      { type: "shape", x: 16, y: 87.6, w: 9, h: 0.3, color: "#1f2a33", opacity: 0.6 },
       {
         type: "text",
-        text: "DD . MM . GODINA",
-        x: 20, y: 80, w: 60, h: 6,
-        fontId: "elegant", fontSizePct: 3, align: "center",
-        color: "#6b6052", bold: false, italic: false, letterSpacing: 0.2,
+        text: "11 . 03 . 2021",
+        x: 26, y: 85, w: 48, h: 6,
+        fontId: "modern", fontSizePct: 2.8, align: "center",
+        color: "#1f2a33", bold: false, italic: false, letterSpacing: 0.15,
       },
-      {
-        type: "text",
-        text: "VENČANJE",
-        x: 20, y: 89, w: 60, h: 5,
-        fontId: "modern", fontSizePct: 2.1, align: "center",
-        color: "#b8895a", bold: false, italic: false, letterSpacing: 0.35,
-      },
+      { type: "shape", x: 75, y: 87.6, w: 9, h: 0.3, color: "#1f2a33", opacity: 0.6 },
     ],
   },
+  // Tema 3 — "Alexa & Tyron": rukopisni (script) naslov, tanka ukrasna
+  // linija sa rombom u sredini, velika fotografija ispod.
   {
-    id: "script",
-    label: "Rukopis i fotografija",
+    id: "tema3",
+    label: "Tema 3",
     elements: [
-      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#faf6ee", opacity: 1 },
+      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#f5f3ef", opacity: 1 },
       {
         type: "text",
-        text: "Ime & Ime",
-        x: 4, y: 4, w: 92, h: 15,
+        text: "Alexa & Tyron",
+        x: 4, y: 3, w: 92, h: 14,
         fontId: "script", fontSizePct: 9, align: "center",
-        color: "#2b2620", bold: false, italic: false,
+        color: "#1c2740", bold: false, italic: false,
       },
-      { type: "shape", x: 18, y: 20.5, w: 27, h: 0.4, color: "#b8895a", opacity: 1 },
+      { type: "shape", x: 20, y: 19.5, w: 25, h: 0.4, color: "#1c2740", opacity: 0.8 },
       {
         type: "text",
         text: "◆",
-        x: 46, y: 18.5, w: 8, h: 4,
-        fontId: "elegant", fontSizePct: 2.4, align: "center",
-        color: "#b8895a", bold: false, italic: false,
+        x: 47, y: 17.8, w: 6, h: 3.5,
+        fontId: "elegant", fontSizePct: 2.2, align: "center",
+        color: "#1c2740", bold: false, italic: false,
       },
-      { type: "shape", x: 55, y: 20.5, w: 27, h: 0.4, color: "#b8895a", opacity: 1 },
-      { type: "photo", src: null, x: 0, y: 25, w: 100, h: 75 },
-      { type: "shape", x: 30, y: 89, w: 40, h: 7, color: "#15171a", opacity: 0.55 },
-      {
-        type: "text",
-        text: "VENČANJE",
-        x: 30, y: 90.6, w: 40, h: 4,
-        fontId: "modern", fontSizePct: 2, align: "center",
-        color: "#ffffff", bold: false, italic: false, letterSpacing: 0.3,
-      },
+      { type: "shape", x: 55, y: 19.5, w: 25, h: 0.4, color: "#1c2740", opacity: 0.8 },
+      { type: "photo", src: null, x: 0, y: 22, w: 100, h: 78 },
     ],
   },
+  // Tema 4 — "Emily and Fred": fotografija preko cele strane, sitan natpis
+  // sa sajtom pri vrhu, dve narandžaste trake sa imenima pri dnu levo.
   {
-    id: "darkened",
-    label: "Zatamnjena fotografija",
+    id: "tema4",
+    label: "Tema 4",
     elements: [
-      { type: "photo", src: null, x: 0, y: 0, w: 100, h: 100, darken: 0.45 },
+      { type: "photo", src: null, x: 0, y: 0, w: 100, h: 100 },
       {
         type: "text",
-        text: "Ime + Ime",
-        x: 6, y: 40, w: 88, h: 16,
-        fontId: "elegant", fontSizePct: 9, align: "center",
+        text: "WWW.EMANDFRED.COM",
+        x: 8, y: 4, w: 84, h: 4,
+        fontId: "modern", fontSizePct: 1.8, align: "center",
+        color: "#ffffff", bold: false, italic: false, letterSpacing: 0.2,
+      },
+      { type: "shape", x: 6, y: 78, w: 55, h: 8, color: "#e8752a", opacity: 1 },
+      {
+        type: "text",
+        text: "EMILY AND FRED",
+        x: 9, y: 79.5, w: 49, h: 5.5,
+        fontId: "modern", fontSizePct: 3.4, align: "left",
         color: "#ffffff", bold: true, italic: false,
       },
-      { type: "shape", x: 0, y: 88, w: 100, h: 12, color: "#15171a", opacity: 0.8 },
+      { type: "shape", x: 6, y: 86, w: 40, h: 5.5, color: "#e8752a", opacity: 1 },
       {
         type: "text",
-        text: "DD . MM . GODINA · MESTO",
-        x: 8, y: 91.5, w: 84, h: 6,
-        fontId: "modern", fontSizePct: 2.2, align: "center",
-        color: "#ffffff", bold: false, italic: false, letterSpacing: 0.3,
+        text: "WEDDING PHOTOS",
+        x: 9, y: 87.2, w: 34, h: 4,
+        fontId: "modern", fontSizePct: 2.1, align: "left",
+        color: "#ffffff", bold: false, italic: false, letterSpacing: 0.1,
       },
     ],
   },
+  // Tema 5 — "Catrina + Bruce": svetla fotografija preko cele strane,
+  // podebljan naslov sa znakom "+", red sitnih ukrasnih ikonica i tamna
+  // traka sa datumom/mestom pri dnu.
   {
-    id: "minimal",
-    label: "Minimalistički potpis",
+    id: "tema5",
+    label: "Tema 5",
     elements: [
-      { type: "photo", src: null, x: 0, y: 0, w: 100, h: 100, darken: 0.2 },
+      { type: "photo", src: null, x: 0, y: 0, w: 100, h: 100 },
       {
         type: "text",
-        text: "Ime & Ime",
-        x: 4, y: 8, w: 92, h: 15,
-        fontId: "script", fontSizePct: 8.5, align: "center",
+        text: "CATRINA + BRUCE",
+        x: 6, y: 35, w: 88, h: 10,
+        fontId: "modern", fontSizePct: 5.6, align: "center",
+        color: "#13213f", bold: true, italic: false, letterSpacing: 0,
+      },
+      { type: "sticker", stickerId: "cake", x: 32, y: 47.5, w: 6, h: 6 },
+      { type: "sticker", stickerId: "rings", x: 39, y: 47.5, w: 6, h: 6 },
+      { type: "sticker", stickerId: "bouquet", x: 46, y: 47.5, w: 6, h: 6 },
+      { type: "sticker", stickerId: "bottle", x: 53, y: 47.5, w: 6, h: 6 },
+      { type: "sticker", stickerId: "ribbon", x: 60, y: 47.5, w: 6, h: 6 },
+      { type: "shape", x: 32, y: 86, w: 36, h: 6, color: "#15213b", opacity: 1 },
+      {
+        type: "text",
+        text: "20/9/2021 // HOUSTON, TX",
+        x: 32, y: 87.6, w: 36, h: 4,
+        fontId: "modern", fontSizePct: 1.7, align: "center",
         color: "#ffffff", bold: false, italic: false,
       },
-      { type: "shape", x: 35, y: 24, w: 30, h: 0.4, color: "#ffffff", opacity: 0.9 },
-      { type: "shape", x: 25, y: 86, w: 50, h: 7, color: "#ffffff", opacity: 0.18 },
+    ],
+  },
+  // Tema 6 — "Olivia & Aaron": rukopisni naslov sa ukrasnom linijom, velika
+  // fotografija ispod, providna "pilula" sa tekstom pri dnu levo.
+  {
+    id: "tema6",
+    label: "Tema 6",
+    elements: [
+      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#faf7f2", opacity: 1 },
       {
         type: "text",
-        text: "SAČUVAJTE DATUM",
-        x: 25, y: 87.6, w: 50, h: 4,
-        fontId: "modern", fontSizePct: 1.9, align: "center",
-        color: "#ffffff", bold: false, italic: false, letterSpacing: 0.3,
+        text: "Olivia & Aaron",
+        x: 4, y: 4, w: 92, h: 14,
+        fontId: "script", fontSizePct: 8.5, align: "center",
+        color: "#1c2740", bold: false, italic: false,
+      },
+      { type: "shape", x: 30, y: 19.5, w: 16, h: 0.4, color: "#1c2740", opacity: 0.7 },
+      {
+        type: "text",
+        text: "✦",
+        x: 48, y: 17.8, w: 4, h: 3,
+        fontId: "elegant", fontSizePct: 2, align: "center",
+        color: "#1c2740", bold: false, italic: false,
+      },
+      { type: "shape", x: 54, y: 19.5, w: 16, h: 0.4, color: "#1c2740", opacity: 0.7 },
+      { type: "photo", src: null, x: 0, y: 22, w: 100, h: 78 },
+      { type: "shape", x: 6, y: 89, w: 46, h: 6, color: "#f5f1e8", opacity: 0.85 },
+      {
+        type: "text",
+        text: "WEDDING PHOTOGRAPHY",
+        x: 6, y: 90.4, w: 46, h: 4,
+        fontId: "modern", fontSizePct: 2, align: "center",
+        color: "#2b2620", bold: false, italic: false, letterSpacing: 0.25,
       },
     ],
   },
@@ -533,6 +596,12 @@ function getBackground(id) {
 //    desnu. Korice ne dobijaju sliku (tema pokriva samo strane 2–29),
 //    već jednobojnu podlogu.
 function pageBackgroundStyle(backgroundId, page, pageIndex) {
+  // Zadnja korica ima sopstvenu, slobodno izabranu boju (color picker) —
+  // nezavisno od teme koju bira prednja korica/razvod.
+  if (page.role === "cover-back" && page.backColor) {
+    return { background: page.backColor };
+  }
+
   const bg = getBackground(backgroundId);
   if (!bg.image) return bg.style || {};
 
@@ -1215,32 +1284,56 @@ export default function Editor({ typeId }) {
         </main>
 
         <aside className={styles.panel}>
-          <section className={styles.panelSection}>
-            <h3>Tema stranice</h3>
-            <p className={styles.hint}>
-              Dostupne teme: {availableBackgrounds.length}. Primenjuje se na obe
-              strane ovog razvoda ({describeView(currentView, album.pages.length)})
-              {hasImageThemes ? "; dekorativne teme pokrivaju strane 2–29" : ""}.
-            </p>
-            <div className={styles.swatchRow}>
-              {availableBackgrounds.map((bg) => (
-                <button
-                  type="button"
-                  key={bg.id}
-                  className={`${styles.swatch} ${
-                    activePage.background === bg.id ? styles.swatchActive : ""
-                  }`}
-                  style={bg.swatchStyle || bg.style}
-                  onClick={() => setSpreadBackground(bg.id)}
-                  title={bg.label}
-                >
-                  {activePage.background === bg.id && (
-                    <span className={styles.swatchCheck}>✓</span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </section>
+          {activePage.role === "cover-back" ? (
+            <section className={styles.panelSection}>
+              <h3>Boja zadnje korice</h3>
+              <p className={styles.hint}>
+                Zadnja korica ima samo boju cele strane — bez teme, fotografija ili
+                stikera.
+              </p>
+              <label className={styles.fieldLabel}>
+                Boja
+                <input
+                  type="color"
+                  value={
+                    activePage.backColor ||
+                    getBackground(activePage.background)?.coverStyle?.background ||
+                    "#ffffff"
+                  }
+                  onChange={(e) =>
+                    updatePage(activePage.id, (p) => ({ ...p, backColor: e.target.value }))
+                  }
+                />
+              </label>
+            </section>
+          ) : (
+            <section className={styles.panelSection}>
+              <h3>Tema stranice</h3>
+              <p className={styles.hint}>
+                Dostupne teme: {availableBackgrounds.length}. Primenjuje se na obe
+                strane ovog razvoda ({describeView(currentView, album.pages.length)})
+                {hasImageThemes ? "; dekorativne teme pokrivaju strane 2–29" : ""}.
+              </p>
+              <div className={styles.swatchRow}>
+                {availableBackgrounds.map((bg) => (
+                  <button
+                    type="button"
+                    key={bg.id}
+                    className={`${styles.swatch} ${
+                      activePage.background === bg.id ? styles.swatchActive : ""
+                    }`}
+                    style={bg.swatchStyle || bg.style}
+                    onClick={() => setSpreadBackground(bg.id)}
+                    title={bg.label}
+                  >
+                    {activePage.background === bg.id && (
+                      <span className={styles.swatchCheck}>✓</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
 
           {activePage.role === "content" && (
             <section className={styles.panelSection}>
@@ -1291,7 +1384,7 @@ export default function Editor({ typeId }) {
             </section>
           )}
 
-          {typeId === "vencanje" && activePage.role !== "content" && (
+          {typeId === "vencanje" && activePage.role === "cover-front" && (
             <section className={styles.panelSection}>
               <h3>Stil korice</h3>
               <p className={styles.hint}>
@@ -1318,18 +1411,24 @@ export default function Editor({ typeId }) {
           <section className={styles.panelSection}>
             <h3>Dodaj element</h3>
             <p className={styles.hint}>
-              Dodaje se na stranu {activePageNumber} (kliknite na stranu da je izaberete).
+              {activePage.role === "cover-back"
+                ? `Zadnja korica — jedino se može dodati tekst (strana ${activePageNumber}).`
+                : `Dodaje se na stranu ${activePageNumber} (kliknite na stranu da je izaberete).`}
             </p>
             <div className={styles.addRow}>
               <button type="button" className="btn-ghost" onClick={addTextElement}>
                 + Tekst
               </button>
-              <button type="button" className="btn-ghost" onClick={triggerAddPhoto}>
-                + Slika
-              </button>
-              <button type="button" className="btn-ghost" onClick={() => addShapeElement()}>
-                + Traka
-              </button>
+              {activePage.role !== "cover-back" && (
+                <>
+                  <button type="button" className="btn-ghost" onClick={triggerAddPhoto}>
+                    + Slika
+                  </button>
+                  <button type="button" className="btn-ghost" onClick={() => addShapeElement()}>
+                    + Traka
+                  </button>
+                </>
+              )}
             </div>
             <input
               ref={fileInputRef}
@@ -1340,7 +1439,7 @@ export default function Editor({ typeId }) {
             />
           </section>
 
-          {typeId === "vencanje" && (
+          {typeId === "vencanje" && activePage.role !== "cover-back" && (
             <section className={styles.panelSection}>
               <h3>Stikeri</h3>
               <p className={styles.hint}>
@@ -1635,6 +1734,24 @@ function StageElement({
   const boxRef = useRef(null);
   const textRef = useRef(null);
   const [editing, setEditing] = useState(false);
+  // Dvoklik na fotografiju uključuje poseban režim u kom prevlačenje ne
+  // pomera/menja veličinu okvira, već samo pomera sliku UNUTAR okvira
+  // (menja object-position). Isključuje se kad se element deselektuje,
+  // na Escape ili ponovnim dvoklikom.
+  const [photoPanMode, setPhotoPanMode] = useState(false);
+
+  useEffect(() => {
+    if (!selected && photoPanMode) setPhotoPanMode(false);
+  }, [selected, photoPanMode]);
+
+  useEffect(() => {
+    if (!photoPanMode) return;
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setPhotoPanMode(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [photoPanMode]);
 
   function onPointerDown(e) {
     if (!interactive || isExporting) return;
@@ -1645,6 +1762,20 @@ function StageElement({
     // prevlačenje niti se hvata pokazivač, da klik ispravno stigne do
     // dugmeta ispod (setPointerCapture bi mu "ukrao" naredni klik).
     if (e.target.closest("[data-empty-slot]")) return;
+    if (photoPanMode && el.type === "photo" && el.src) {
+      dragRef.current = {
+        mode: "pan",
+        startX: e.clientX,
+        startY: e.clientY,
+        orig: { x: el.focalX ?? 50, y: el.focalY ?? 50 },
+        // Pomeranje unutar okvira se računa relativno na sopstvenu veličinu
+        // okvira (ne na celu stranu), da brzina pomeranja odgovara prevučenom
+        // razmaku bez obzira na to koliko je sam okvir velik/mali.
+        rect: boxRef.current.getBoundingClientRect(),
+      };
+      boxRef.current.setPointerCapture(e.pointerId);
+      return;
+    }
     const rect = boxRef.current.parentElement.getBoundingClientRect();
     const isHandle = !!e.target.closest("[data-handle]");
     const mode = isHandle ? "resize" : "move";
@@ -1673,7 +1804,13 @@ function StageElement({
     if (!d) return;
     const dxPct = ((e.clientX - d.startX) / d.rect.width) * 100;
     const dyPct = ((e.clientY - d.startY) / d.rect.height) * 100;
-    if (d.mode === "move") {
+    if (d.mode === "pan") {
+      // Prevlačenje udesno/naniže treba da "otkrije" levi/gornji deo slike
+      // (kao pomeranje fotografije ispod fiksnog okvira), zato se oduzima.
+      const nfx = clamp(d.orig.x - dxPct, 0, 100);
+      const nfy = clamp(d.orig.y - dyPct, 0, 100);
+      onChange({ focalX: nfx, focalY: nfy });
+    } else if (d.mode === "move") {
       // Pomeranje je uvek ograničeno na granice strane (0–100%).
       let nx = clamp(d.orig.x + dxPct, 0, 100 - el.w);
       let ny = clamp(d.orig.y + dyPct, 0, 100 - el.h);
@@ -1707,7 +1844,13 @@ function StageElement({
   }
 
   function onDoubleClick(e) {
-    if (!interactive || el.type !== "text") return;
+    if (!interactive) return;
+    if (el.type === "photo" && el.src) {
+      e.stopPropagation();
+      setPhotoPanMode((v) => !v);
+      return;
+    }
+    if (el.type !== "text") return;
     e.stopPropagation();
     setEditing(true);
     requestAnimationFrame(() => textRef.current?.focus());
@@ -1730,7 +1873,7 @@ function StageElement({
       ref={boxRef}
       className={`${styles.element} ${selected ? styles.elementSelected : ""} ${
         interactive ? styles.interactiveEl : ""
-      }`}
+      } ${photoPanMode ? styles.photoPanMode : ""}`}
       style={style}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -1741,7 +1884,13 @@ function StageElement({
       {el.type === "photo" ? (
         el.src ? (
           <>
-            <img src={el.src} alt="" draggable={false} className={styles.photo} />
+            <img
+              src={el.src}
+              alt=""
+              draggable={false}
+              className={styles.photo}
+              style={{ objectPosition: `${el.focalX ?? 50}% ${el.focalY ?? 50}%` }}
+            />
             {el.darken > 0 && (
               <div
                 className={styles.photoDarken}
@@ -1786,6 +1935,11 @@ function StageElement({
             fontWeight: el.bold ? 700 : 400,
             fontStyle: el.italic ? "italic" : "normal",
             textAlign: el.align,
+            // .text centrira sadržaj flex-om — bez ovoga izbor poravnanja
+            // levo/desno ne bi ništa menjao za jednoredan tekst koji je uži
+            // od okvira (textAlign sam po sebi tu ne utiče).
+            justifyContent:
+              el.align === "left" ? "flex-start" : el.align === "right" ? "flex-end" : "center",
             letterSpacing: el.letterSpacing ? `${el.letterSpacing}em` : "normal",
             userSelect: editing ? "text" : "none",
           }}
@@ -1793,7 +1947,7 @@ function StageElement({
           {el.text}
         </div>
       )}
-      {interactive && selected && !isExporting && (
+      {interactive && selected && !isExporting && !photoPanMode && (
         <span className={styles.resizeHandle} data-handle />
       )}
     </div>
@@ -1851,6 +2005,21 @@ function CoverStylePreviewIcon({ elements }) {
                 height: `${el.h}%`,
                 background: el.color,
                 opacity: el.opacity ?? 1,
+              }}
+            />
+          );
+        }
+        if (el.type === "sticker") {
+          return (
+            <span
+              key={i}
+              style={{
+                left: `${el.x}%`,
+                top: `${el.y}%`,
+                width: `${el.w}%`,
+                height: `${el.h}%`,
+                background: "#b8895a",
+                borderRadius: "50%",
               }}
             />
           );

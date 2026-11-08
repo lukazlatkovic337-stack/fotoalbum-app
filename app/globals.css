@@ -104,24 +104,29 @@ img {
 }
 
 .home-inner {
-  max-width: 1080px;
+  max-width: 1180px;
   margin: 0 auto;
   padding: 4.5rem 1.5rem 5rem;
 }
 
 .home-hero {
-  text-align: center;
-  max-width: 700px;
-  margin: 0 auto 3.5rem;
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  margin: 0 auto 4.5rem;
+}
+
+.home-hero-text {
+  flex: 1 1 420px;
+  min-width: 0;
 }
 
 .home-brand {
-  --brand-h: 84px;
+  --brand-h: 72px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 1.1rem;
-  margin: 0 auto 1.5rem;
+  gap: 1rem;
+  margin: 0 0 2rem;
 }
 
 .home-logo {
@@ -155,10 +160,123 @@ img {
   margin: 0.2rem 0 0;
 }
 
-.home-hero p {
+.home-headline {
+  font-family: var(--font-elegant), Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(1.8rem, 3.6vw, 2.7rem);
+  line-height: 1.22;
+  margin: 0 0 1.1rem;
+  color: var(--moon-text);
+}
+
+.home-lede {
   color: var(--moon-muted);
   font-size: 1.05rem;
-  margin: 0;
+  margin: 0 0 2rem;
+  max-width: 46ch;
+}
+
+.home-cta {
+  display: inline-block;
+}
+
+/* ---------- Kolaž fotografija u hero sekciji ---------- */
+
+.home-collage {
+  position: relative;
+  flex: 1.4 1 480px;
+  min-width: 0;
+  height: 560px;
+}
+
+.home-collage-photo {
+  position: absolute;
+  width: 30%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 6px solid #f3f1ec;
+  box-shadow: 0 25px 50px -18px rgba(0, 0, 0, 0.6);
+}
+
+.home-collage-1 {
+  top: -2%;
+  left: 2%;
+  width: 30%;
+  transform: rotate(-9deg);
+  z-index: 4;
+}
+
+.home-collage-2 {
+  top: 2%;
+  left: 30%;
+  width: 26%;
+  transform: rotate(4deg);
+  z-index: 2;
+}
+
+.home-collage-3 {
+  top: -4%;
+  left: 58%;
+  width: 32%;
+  transform: rotate(-3deg);
+  z-index: 5;
+}
+
+.home-collage-4 {
+  top: 18%;
+  left: 4%;
+  width: 26%;
+  transform: rotate(7deg);
+  z-index: 6;
+}
+
+.home-collage-5 {
+  top: 22%;
+  left: 32%;
+  width: 30%;
+  transform: rotate(-6deg);
+  z-index: 7;
+}
+
+.home-collage-6 {
+  top: 16%;
+  left: 64%;
+  width: 28%;
+  transform: rotate(6deg);
+  z-index: 1;
+}
+
+.home-collage-7 {
+  top: 44%;
+  left: 0%;
+  width: 26%;
+  transform: rotate(-5deg);
+  z-index: 8;
+}
+
+.home-collage-8 {
+  top: 46%;
+  left: 26%;
+  width: 30%;
+  transform: rotate(5deg);
+  z-index: 9;
+}
+
+.home-collage-9 {
+  top: 42%;
+  left: 58%;
+  width: 28%;
+  transform: rotate(-8deg);
+  z-index: 3;
+}
+
+.home-collage-10 {
+  top: 66%;
+  left: 36%;
+  width: 28%;
+  transform: rotate(8deg);
+  z-index: 10;
 }
 
 .type-grid {
@@ -251,15 +369,6 @@ img {
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
 }
 
-.home-contact {
-  margin-top: 3.5rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2.2rem;
-  flex-wrap: wrap;
-}
-
 .home-contact-link {
   display: inline-flex;
   align-items: center;
@@ -281,6 +390,124 @@ img {
 }
 .home-contact-link:hover {
   color: var(--moon-accent);
+}
+
+/* ---------- Footer ---------- */
+
+.home-footer {
+  background: var(--moon-bg-bottom);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 3.5rem 1.5rem 2rem;
+}
+
+.home-footer-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1.3fr;
+  gap: 2.5rem;
+}
+
+.home-footer-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.home-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.home-footer-logo {
+  height: 36px;
+  width: auto;
+}
+
+.home-footer-title {
+  font-family: var(--font-elegant), Georgia, serif;
+  font-size: 1.2rem;
+  color: var(--moon-text);
+}
+
+.home-footer-heading {
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--moon-accent);
+  margin: 0;
+}
+
+.home-footer-text {
+  color: var(--moon-muted);
+  font-size: 0.92rem;
+  margin: 0;
+  max-width: 34ch;
+}
+
+.home-footer-map-col {
+  width: 100%;
+}
+
+.home-map-frame {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  /* Google mapa nema ugrađenu tamnu temu bez API ključa — ovo je uobičajen
+     CSS trik koji invertuje svetlinu pa vrati boje u normalu, da se mapa
+     uklopi u tamnu "moonlight" pozadinu sajta. */
+  filter: invert(96%) hue-rotate(180deg) contrast(0.92);
+}
+
+.home-map-frame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.home-footer-copy {
+  max-width: 1180px;
+  margin: 2.5rem auto 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--moon-muted);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .home-hero {
+    flex-direction: column;
+  }
+  .home-collage {
+    width: 100%;
+    height: 480px;
+  }
+  .home-footer-inner {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Na uskim ekranima apsolutno pozicioniran kolaž postaje nepredvidiv —
+   slike se prikazuju jedna ispod druge, i dalje blago zarotirane. */
+@media (max-width: 600px) {
+  .home-collage {
+    position: static;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.4rem;
+    padding: 0.5rem 0 1rem;
+  }
+  .home-collage-photo {
+    position: static;
+    width: 82% !important;
+  }
 }
 
 @media (max-width: 760px) {

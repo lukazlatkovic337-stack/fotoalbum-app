@@ -248,6 +248,17 @@
   outline-offset: 2px;
 }
 
+/* Režim pomeranja slike UNUTAR okvira (dvoklik na sliku) — drugačija
+   boja/stil ivice da se jasno razlikuje od običnog izabranog elementa. */
+.photoPanMode {
+  outline: 2px dashed #2f7af0;
+  outline-offset: 2px;
+  cursor: grab;
+}
+.photoPanMode:active {
+  cursor: grabbing;
+}
+
 .photo {
   width: 100%;
   height: 100%;
