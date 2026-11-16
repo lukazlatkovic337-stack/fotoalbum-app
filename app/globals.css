@@ -93,13 +93,35 @@ img {
   --moon-muted: #aaadb5;
   --moon-accent: #d9c08a;
 
+  /* Pozadina gornjeg dela (hero + kartice) namerno NIJE ravna boja — ima
+     teksturu platna kao na koricama uvezanog foto albuma ("lanena"
+     ukrštena šara pod uglom), sa mekim "svetlom" pri vrhu kao da je album
+     osvetljen odozgo u foto-studiju, i toplim foliranim sjajem u uglu. */
+  --hero-ink: #2c2318;
+  --hero-ink-muted: #6f6250;
+
   min-height: 100vh;
-  background: radial-gradient(
-      120% 90% at 50% -10%,
-      var(--moon-bg-top) 0%,
-      var(--moon-bg-mid) 55%,
-      var(--moon-bg-bottom) 100%
-    );
+  background-color: #ece3d1;
+  background-image: radial-gradient(
+      1200px 760px at 50% -12%,
+      rgba(255, 250, 240, 0.65),
+      transparent 60%
+    ),
+    repeating-linear-gradient(
+      45deg,
+      rgba(109, 88, 58, 0.055) 0px,
+      rgba(109, 88, 58, 0.055) 1px,
+      transparent 1px,
+      transparent 5px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(109, 88, 58, 0.055) 0px,
+      rgba(109, 88, 58, 0.055) 1px,
+      transparent 1px,
+      transparent 5px
+    ),
+    radial-gradient(900px 700px at 92% 102%, rgba(156, 112, 71, 0.16), transparent 60%);
   color: var(--moon-text);
 }
 
@@ -133,7 +155,11 @@ img {
   width: auto;
   height: var(--brand-h);
   flex-shrink: 0;
-  filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.45));
+  padding: 0.3rem;
+  background: var(--moon-bg-bottom);
+  border-radius: 10px;
+  box-sizing: content-box;
+  filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.3));
 }
 
 .home-brand-text {
@@ -149,14 +175,14 @@ img {
   font-size: clamp(1.4rem, 2.8vw, 1.9rem);
   line-height: 1.2;
   margin: 0;
-  color: var(--moon-text);
+  color: var(--hero-ink);
   white-space: nowrap;
 }
 
 .home-brand-subtitle {
   font-size: 0.9rem;
   letter-spacing: 0.02em;
-  color: var(--moon-muted);
+  color: var(--hero-ink-muted);
   margin: 0.2rem 0 0;
 }
 
@@ -166,11 +192,11 @@ img {
   font-size: clamp(1.8rem, 3.6vw, 2.7rem);
   line-height: 1.22;
   margin: 0 0 1.1rem;
-  color: var(--moon-text);
+  color: var(--hero-ink);
 }
 
 .home-lede {
-  color: var(--moon-muted);
+  color: var(--hero-ink-muted);
   font-size: 1.05rem;
   margin: 0 0 2rem;
   max-width: 46ch;
@@ -195,8 +221,8 @@ img {
   aspect-ratio: 4 / 3;
   object-fit: cover;
   border-radius: 6px;
-  border: 6px solid #f3f1ec;
-  box-shadow: 0 25px 50px -18px rgba(0, 0, 0, 0.6);
+  border: 6px solid #fffdf8;
+  box-shadow: 0 22px 40px -16px rgba(44, 35, 24, 0.45);
 }
 
 .home-collage-1 {
@@ -281,7 +307,7 @@ img {
 
 .type-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1.5rem;
 }
 

@@ -554,7 +554,6 @@
   font-weight: 600;
 }
 .coverStyleIcon {
-  position: relative;
   display: block;
   width: 42px;
   height: 58px;
@@ -563,12 +562,7 @@
   border: 1px solid var(--color-border);
   overflow: hidden;
   flex-shrink: 0;
-}
-.coverStyleIcon > span {
-  position: absolute;
-}
-.coverIconPhoto {
-  background: #cfc6b4;
+  object-fit: cover;
 }
 
 .fontRow {

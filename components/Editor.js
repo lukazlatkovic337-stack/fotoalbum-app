@@ -8,6 +8,7 @@ import {
   FONTS,
   PAGE_FORMAT_MM,
   addContentSpread,
+  buildExportViews,
   backgroundsForType,
   buildAlbumViews,
   createDefaultAlbum,
@@ -43,6 +44,16 @@ function clampElementBox(el) {
 
 function round2(n) {
   return Math.round(n * 100) / 100;
+}
+
+// Oblik okvira za photo elemente (korice za prvi rođendan): "circle" seče
+// sliku u krug, "rounded" u zaobljen pravougaonik — sama ivica/okvir je već
+// deo pozadinske slike (korica), ovde se samo seče OBLIK fotografije da legne
+// tačno u tu rupu, bez dodatne CSS ivice (koja bi udvostručila krug/okvir).
+function shapeRadius(shape) {
+  if (shape === "circle") return "50%";
+  if (shape === "rounded") return "7%";
+  return undefined;
 }
 
 // Generiše niz pravougaonika za rasporede sa više slika (5–9) — slike su
@@ -338,6 +349,7 @@ function StickerSparkles() {
   );
 }
 
+
 // Gotovi dizajni korice za venčanje — klik postavlja kompletan raspored
 // (fotografija + trake + stilizovan tekst) na trenutnu koricu odjednom;
 // korisnik posle samo zameni sliku i upiše svoja imena/datum. Dostupno
@@ -346,13 +358,14 @@ function StickerSparkles() {
 // šest referentnih dizajna korica koje je poslao korisnik — nisu smišljene
 // od nule, već vernо prate tačno te primere (naziv "Tema 1" ... "Tema 6"
 // odgovara redosledu u kom su te slike poslate).
-const COVER_STYLES = [
+const WEDDING_COVER_STYLES = [
   // Tema 1 — "Jessica & Darren": bledo isprana fotografija cveća, gornji i
   // donji sitni natpis velikim slovima, u sredini ime/i razdvojeno sa "&"
   // uokvireno velikim vitičastim zagradama.
   {
     id: "tema1",
     label: "Tema 1",
+    thumbnail: "/cover-styles/tema1.jpg",
     elements: [
       { type: "photo", src: null, x: 0, y: 0, w: 100, h: 100 },
       {
@@ -371,7 +384,7 @@ const COVER_STYLES = [
       },
       {
         type: "text",
-        text: "Jessica",
+        text: "Ime",
         x: 18, y: 38, w: 64, h: 9,
         fontId: "modern", fontSizePct: 7.4, align: "center",
         color: "#1b1e24", bold: true, italic: false,
@@ -385,7 +398,7 @@ const COVER_STYLES = [
       },
       {
         type: "text",
-        text: "Darren",
+        text: "Ime",
         x: 18, y: 54, w: 64, h: 9,
         fontId: "modern", fontSizePct: 7.4, align: "center",
         color: "#1b1e24", bold: true, italic: false,
@@ -412,11 +425,12 @@ const COVER_STYLES = [
   {
     id: "tema2",
     label: "Tema 2",
+    thumbnail: "/cover-styles/tema2.jpg",
     elements: [
       { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#eef3f5", opacity: 1 },
       {
         type: "text",
-        text: "KARINA & ANDREW",
+        text: "Ime & Ime",
         x: 8, y: 6, w: 84, h: 8,
         fontId: "modern", fontSizePct: 4.2, align: "center",
         color: "#1f2a33", bold: true, italic: false, letterSpacing: 0.25,
@@ -426,7 +440,7 @@ const COVER_STYLES = [
       { type: "shape", x: 16, y: 87.6, w: 9, h: 0.3, color: "#1f2a33", opacity: 0.6 },
       {
         type: "text",
-        text: "11 . 03 . 2021",
+        text: "15. 07. 2026.",
         x: 26, y: 85, w: 48, h: 6,
         fontId: "modern", fontSizePct: 2.8, align: "center",
         color: "#1f2a33", bold: false, italic: false, letterSpacing: 0.15,
@@ -439,11 +453,12 @@ const COVER_STYLES = [
   {
     id: "tema3",
     label: "Tema 3",
+    thumbnail: "/cover-styles/tema3.jpg",
     elements: [
       { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#f5f3ef", opacity: 1 },
       {
         type: "text",
-        text: "Alexa & Tyron",
+        text: "Ime & Ime",
         x: 4, y: 3, w: 92, h: 14,
         fontId: "script", fontSizePct: 9, align: "center",
         color: "#1c2740", bold: false, italic: false,
@@ -465,19 +480,13 @@ const COVER_STYLES = [
   {
     id: "tema4",
     label: "Tema 4",
+    thumbnail: "/cover-styles/tema4.jpg",
     elements: [
       { type: "photo", src: null, x: 0, y: 0, w: 100, h: 100 },
-      {
-        type: "text",
-        text: "WWW.EMANDFRED.COM",
-        x: 8, y: 4, w: 84, h: 4,
-        fontId: "modern", fontSizePct: 1.8, align: "center",
-        color: "#ffffff", bold: false, italic: false, letterSpacing: 0.2,
-      },
       { type: "shape", x: 6, y: 78, w: 55, h: 8, color: "#e8752a", opacity: 1 },
       {
         type: "text",
-        text: "EMILY AND FRED",
+        text: "Ime & Ime",
         x: 9, y: 79.5, w: 49, h: 5.5,
         fontId: "modern", fontSizePct: 3.4, align: "left",
         color: "#ffffff", bold: true, italic: false,
@@ -485,7 +494,7 @@ const COVER_STYLES = [
       { type: "shape", x: 6, y: 86, w: 40, h: 5.5, color: "#e8752a", opacity: 1 },
       {
         type: "text",
-        text: "WEDDING PHOTOS",
+        text: "Naše venčanje",
         x: 9, y: 87.2, w: 34, h: 4,
         fontId: "modern", fontSizePct: 2.1, align: "left",
         color: "#ffffff", bold: false, italic: false, letterSpacing: 0.1,
@@ -498,11 +507,12 @@ const COVER_STYLES = [
   {
     id: "tema5",
     label: "Tema 5",
+    thumbnail: "/cover-styles/tema5.jpg",
     elements: [
       { type: "photo", src: null, x: 0, y: 0, w: 100, h: 100 },
       {
         type: "text",
-        text: "CATRINA + BRUCE",
+        text: "Ime & Ime",
         x: 6, y: 35, w: 88, h: 10,
         fontId: "modern", fontSizePct: 5.6, align: "center",
         color: "#13213f", bold: true, italic: false, letterSpacing: 0,
@@ -515,7 +525,7 @@ const COVER_STYLES = [
       { type: "shape", x: 32, y: 86, w: 36, h: 6, color: "#15213b", opacity: 1 },
       {
         type: "text",
-        text: "20/9/2021 // HOUSTON, TX",
+        text: "15.07.2026. // Niš, Srbija",
         x: 32, y: 87.6, w: 36, h: 4,
         fontId: "modern", fontSizePct: 1.7, align: "center",
         color: "#ffffff", bold: false, italic: false,
@@ -527,11 +537,12 @@ const COVER_STYLES = [
   {
     id: "tema6",
     label: "Tema 6",
+    thumbnail: "/cover-styles/tema6.jpg",
     elements: [
       { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#faf7f2", opacity: 1 },
       {
         type: "text",
-        text: "Olivia & Aaron",
+        text: "Ime & Ime",
         x: 4, y: 4, w: 92, h: 14,
         fontId: "script", fontSizePct: 8.5, align: "center",
         color: "#1c2740", bold: false, italic: false,
@@ -553,6 +564,387 @@ const COVER_STYLES = [
         x: 6, y: 90.4, w: 46, h: 4,
         fontId: "modern", fontSizePct: 2, align: "center",
         color: "#2b2620", bold: false, italic: false, letterSpacing: 0.25,
+      },
+    ],
+  },
+];
+
+// Gotovi dizajni korice za prvi rođendan — za razliku od venčanih stilova
+// iznad (koji su ručno iscrtani iz elemenata), ovde se kao pozadina koristi
+// SAMA referentna slika korisnika (public/primer-prvi/koricaN.png), digitalno
+// očišćena od primera imena/datuma (public/cover-styles/koricaN-bg.jpg) —
+// sve dekorativne ilustracije (baloni, brojevi, životinje, itd.) ostaju
+// tačno onakve kakve su poslate, nisu stikeri niti rekonstrukcija. Preko te
+// pozadine idu samo editable tekst (ime/datum) i, gde je u originalu bio
+// krug/pravougaonik za sliku, editable photo element na tačno toj poziciji.
+const BIRTHDAY_COVER_STYLES = [
+  // Korica 1 — bg: public/primer-prvi/korica01.png (očišćeno ime+datum).
+  {
+    id: "korica1",
+    label: "Korica 1",
+    thumbnail: "/primer-prvi/korica01.png",
+    elements: [
+      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#f3efe6", image: "/cover-styles/korica1-bg.jpg" },
+      {
+        type: "photo", src: null, shape: "circle",
+        x: 33, y: 62.8, w: 33.9, h: 24.1,
+      },
+      {
+        type: "text",
+        text: "Ime's First",
+        x: 8, y: 43, w: 84, h: 10,
+        fontId: "script", fontSizePct: 8.5, align: "center",
+        color: "#5b84a0", bold: true, italic: false,
+      },
+      {
+        type: "text",
+        text: "Birthday",
+        x: 8, y: 53, w: 84, h: 10,
+        fontId: "script", fontSizePct: 8.5, align: "center",
+        color: "#5b84a0", bold: true, italic: false,
+      },
+      {
+        type: "text",
+        text: "17",
+        x: 33, y: 86.5, w: 34, h: 7,
+        fontId: "modern", fontSizePct: 5, align: "center",
+        color: "#5b84a0", bold: true, italic: false,
+      },
+      {
+        type: "text",
+        text: "NOVEMBAR",
+        x: 20, y: 94.5, w: 60, h: 4,
+        fontId: "modern", fontSizePct: 2, align: "center",
+        color: "#5b84a0", bold: false, italic: false, letterSpacing: 0.3,
+      },
+    ],
+  },
+  // Korica 2 — bg: public/primer-prvi/korica02.png (očišćeno ime+datum).
+  {
+    id: "korica2",
+    label: "Korica 2",
+    thumbnail: "/primer-prvi/korica02.png",
+    elements: [
+      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#f9e8e6", image: "/cover-styles/korica2-bg.jpg" },
+      {
+        type: "text",
+        text: "Ime's",
+        x: 30, y: 15, w: 40, h: 9,
+        fontId: "elegant", fontSizePct: 7, align: "center",
+        color: "#a33a3a", bold: true, italic: false,
+      },
+      {
+        type: "text",
+        text: "First Birthday",
+        x: 15, y: 26, w: 70, h: 11,
+        fontId: "elegant", fontSizePct: 7.5, align: "center",
+        color: "#a33a3a", bold: false, italic: true,
+      },
+      {
+        type: "photo", src: null, shape: "circle",
+        x: 30, y: 40.9, w: 39.2, h: 27.8,
+      },
+      {
+        type: "text",
+        text: "10",
+        x: 38, y: 70, w: 24, h: 7,
+        fontId: "modern", fontSizePct: 6, align: "center",
+        color: "#6b4a3f", bold: false, italic: false,
+      },
+      {
+        type: "text",
+        text: "DEC",
+        x: 35, y: 78, w: 30, h: 4,
+        fontId: "modern", fontSizePct: 2.2, align: "center",
+        color: "#6b4a3f", bold: false, italic: false, letterSpacing: 0.3,
+      },
+      {
+        type: "text",
+        text: "2026",
+        x: 25, y: 82.5, w: 50, h: 6,
+        fontId: "modern", fontSizePct: 4.5, align: "center",
+        color: "#6b4a3f", bold: true, italic: false,
+      },
+    ],
+  },
+  // Korica 3 — bg: public/primer-prvi/korica03.png (očišćeno ime).
+  {
+    id: "korica3",
+    label: "Korica 3",
+    thumbnail: "/primer-prvi/korica03.png",
+    elements: [
+      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#ffffff", image: "/cover-styles/korica3-bg.jpg" },
+      {
+        type: "text",
+        text: "Ime's",
+        x: 25, y: 56, w: 45, h: 9,
+        fontId: "modern", fontSizePct: 7, align: "center",
+        color: "#e8a33c", bold: true, italic: false,
+      },
+      {
+        type: "text",
+        text: "First Birthday",
+        x: 24, y: 64.5, w: 48, h: 6,
+        fontId: "modern", fontSizePct: 4.5, align: "center",
+        color: "#e8752a", bold: true, italic: false,
+      },
+      {
+        type: "photo", src: null, shape: "rounded",
+        x: 16.3, y: 70.6, w: 63.9, h: 16.9,
+      },
+    ],
+  },
+  // Korica 4 — bg: public/primer-prvi/korica04.png (očišćeno ime+datum).
+  // BEZ fotografije — samo tekst (po traženju).
+  {
+    id: "korica4",
+    label: "Korica 4",
+    thumbnail: "/primer-prvi/korica04.png",
+    elements: [
+      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#ffffff", image: "/cover-styles/korica4-bg.jpg" },
+      {
+        type: "text",
+        text: "IME'S",
+        x: 16, y: 14, w: 68, h: 9,
+        fontId: "modern", fontSizePct: 9, align: "center",
+        color: "#e8577f", bold: true, italic: false,
+      },
+      {
+        type: "text",
+        text: "19. jun | 15:00",
+        x: 21, y: 75, w: 63, h: 6,
+        fontId: "modern", fontSizePct: 4.2, align: "center",
+        color: "#e8577f", bold: true, italic: false,
+      },
+    ],
+  },
+  // Korica 5 — bg: public/primer-prvi/korica05.png (očišćeno ime).
+  {
+    id: "korica5",
+    label: "Korica 5",
+    thumbnail: "/primer-prvi/korica05.png",
+    elements: [
+      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#ffffff", image: "/cover-styles/korica5-bg.jpg" },
+      {
+        type: "text",
+        text: "Ime's",
+        x: 20, y: 43, w: 60, h: 9,
+        fontId: "elegant", fontSizePct: 7, align: "center",
+        color: "#b05a7a", bold: false, italic: true,
+      },
+      {
+        type: "text",
+        text: "fairy first",
+        x: 26, y: 50, w: 48, h: 8,
+        fontId: "script", fontSizePct: 6.5, align: "center",
+        color: "#c9922c", bold: false, italic: false,
+      },
+      {
+        type: "text",
+        text: "BIRTHDAY",
+        x: 26, y: 58.5, w: 48, h: 6,
+        fontId: "modern", fontSizePct: 4, align: "center",
+        color: "#6b6459", bold: false, italic: false, letterSpacing: 0.35,
+      },
+      {
+        type: "photo", src: null, shape: "circle",
+        x: 29.5, y: 67.2, w: 41.9, h: 29.7,
+      },
+    ],
+  },
+  // Korica 6 — bg: public/primer-prvi/korica06.png (očišćeno ime+datum).
+  {
+    id: "korica6",
+    label: "Korica 6",
+    thumbnail: "/primer-prvi/korica06.png",
+    elements: [
+      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#faf1ee", image: "/cover-styles/korica6-bg.jpg" },
+      {
+        type: "text",
+        text: "Ime's",
+        x: 30, y: 17, w: 40, h: 9,
+        fontId: "elegant", fontSizePct: 7.5, align: "center",
+        color: "#c0514f", bold: true, italic: true,
+      },
+      {
+        type: "text",
+        text: "First Birthday",
+        x: 18, y: 26, w: 64, h: 9,
+        fontId: "elegant", fontSizePct: 7.5, align: "center",
+        color: "#c0514f", bold: true, italic: true,
+      },
+      {
+        type: "photo", src: null, shape: "circle",
+        x: 27.1, y: 35.9, w: 47, h: 33.3,
+      },
+      {
+        type: "text",
+        text: "DECEMBER",
+        x: 30, y: 70, w: 40, h: 4,
+        fontId: "modern", fontSizePct: 2.2, align: "center",
+        color: "#3f6b6a", bold: false, italic: false, letterSpacing: 0.3,
+      },
+      {
+        type: "text",
+        text: "18",
+        x: 35, y: 75, w: 30, h: 8,
+        fontId: "elegant", fontSizePct: 7, align: "center",
+        color: "#3f6b6a", bold: true, italic: true,
+      },
+      {
+        type: "text",
+        text: "2026",
+        x: 32, y: 84, w: 36, h: 5,
+        fontId: "modern", fontSizePct: 4, align: "center",
+        color: "#3f6b6a", bold: true, italic: false,
+      },
+    ],
+  },
+  // Korica 7 — bg: public/primer-prvi/korica07.jpg (očišćeno "Baby's").
+  // BEZ fotografije — samo tekst (po traženju).
+  {
+    id: "korica7",
+    label: "Korica 7",
+    thumbnail: "/primer-prvi/korica07.jpg",
+    elements: [
+      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#e3e3e2", image: "/cover-styles/korica7-bg.jpg" },
+      {
+        type: "text",
+        text: "Ime's",
+        x: 28, y: 28, w: 46, h: 9,
+        fontId: "script", fontSizePct: 7.5, align: "center",
+        color: "#1c1c1c", bold: false, italic: false,
+      },
+      {
+        type: "text",
+        text: "FIRST YEAR",
+        x: 16, y: 38, w: 68, h: 9,
+        fontId: "elegant", fontSizePct: 8, align: "center",
+        color: "#1c1c1c", bold: false, italic: false,
+      },
+      {
+        type: "text",
+        text: "BOOK",
+        x: 16, y: 48, w: 68, h: 9,
+        fontId: "elegant", fontSizePct: 8, align: "center",
+        color: "#1c1c1c", bold: false, italic: false,
+      },
+      {
+        type: "text",
+        text: "A LITTLE BOOK OF BIG MOMENTS",
+        x: 16, y: 58, w: 68, h: 4,
+        fontId: "modern", fontSizePct: 2, align: "center",
+        color: "#3a3a3a", bold: false, italic: false, letterSpacing: 0.25,
+      },
+    ],
+  },
+];
+
+// Korice za 18. rođendan — bg: public/primer-18/koricaN (očišćeno od
+// primera slike/imena, public/cover-styles/rod18-N-bg.*). Dekoracije
+// (ram, konfete, tortice, brojevi) ostaju tačno onakve kakve su poslate.
+const ROD18_COVER_STYLES = [
+  // Korica 1 — originalna slika je imala neravnomeran razmer (previše se
+  // razvlačila/mutila na B4 strani) pa je pozadina zamenjena čistom,
+  // nacrtanom pozadinom istog stila (ružičasti papir, cvetovi, kukica) —
+  // public/cover-styles/rod18-1-bg.svg, nacrtana tačno u razmeri B4 strane.
+  {
+    id: "rod18-1",
+    label: "Korica 1",
+    thumbnail: "/primer-18/korica01.png",
+    elements: [
+      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#eccdc9", image: "/cover-styles/rod18-1-bg.svg" },
+      {
+        type: "text",
+        text: "Happy",
+        x: 48, y: 7, w: 48, h: 9,
+        fontId: "script", fontSizePct: 7, align: "center",
+        color: "#3a2a28", bold: true, italic: false,
+      },
+      {
+        type: "text",
+        text: "18th birthday",
+        x: 40, y: 16, w: 56, h: 9,
+        fontId: "script", fontSizePct: 7, align: "center",
+        color: "#3a2a28", bold: true, italic: false,
+      },
+      { type: "shape", x: 10, y: 25, w: 50, h: 28, color: "#ffffff" },
+      { type: "photo", src: null, shape: "rounded", x: 12.5, y: 27.3, w: 45, h: 23.4 },
+      { type: "shape", x: 35, y: 47, w: 52, h: 29, color: "#ffffff" },
+      { type: "photo", src: null, shape: "rounded", x: 37.5, y: 49.3, w: 47, h: 24.4 },
+    ],
+  },
+  // Korica 2 — bg: public/primer-18/korica02.jpg (uklonjena slika, naslov,
+  // pasus i datum; tačkice-konfete ostale netaknute).
+  {
+    id: "rod18-2",
+    label: "Korica 2",
+    thumbnail: "/primer-18/korica02.jpg",
+    elements: [
+      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#f7f6f4", image: "/cover-styles/rod18-2-bg.jpg" },
+      {
+        type: "text",
+        text: "Ime turns eighteen",
+        x: 10, y: 9.5, w: 80, h: 14,
+        fontId: "script", fontSizePct: 6, align: "center",
+        color: "#1a1a1a", bold: false, italic: false,
+        customFontFamily: "var(--font-marker), cursive",
+      },
+      { type: "shape", x: 14, y: 27, w: 72, h: 42, color: "#ffffff" },
+      { type: "photo", src: null, shape: "rounded", x: 17, y: 29.5, w: 66, h: 37 },
+      {
+        type: "text",
+        text: "Celebrating a milestone that means the world to me — I'm officially turning 18. Would love to have you there.",
+        x: 9, y: 77, w: 80, h: 12,
+        fontId: "modern", fontSizePct: 2.6, align: "left",
+        color: "#1a1a1a", bold: false, italic: false,
+      },
+      {
+        type: "text",
+        text: "12. avgust • 16h • Adresa 123",
+        x: 10, y: 89.5, w: 85, h: 5,
+        fontId: "modern", fontSizePct: 2.8, align: "left",
+        color: "#1a1a1a", bold: false, italic: false,
+      },
+    ],
+  },
+  // Korica 3 (ranije "Korica 4" — "Korica 3" sa brojem "18" je obrisana) —
+  // bg: public/primer-18/korica04.jpg (uklonjen naslov, slika,
+  // ime i donji tekst; ram/tačkice/tortice/"18" ostaju netaknuti).
+  {
+    id: "rod18-3",
+    label: "Korica 3",
+    thumbnail: "/primer-18/korica04.jpg",
+    elements: [
+      { type: "shape", x: 0, y: 0, w: 100, h: 100, color: "#f8efe4", image: "/cover-styles/rod18-4-bg.jpg" },
+      {
+        type: "text",
+        text: "HAPPY",
+        x: 14.21, y: 4.5, w: 71.57, h: 8,
+        fontId: "elegant", fontSizePct: 6.5, align: "center",
+        color: "#6b4739", bold: true, italic: false,
+      },
+      {
+        type: "text",
+        text: "BIRTHDAY",
+        x: 14.21, y: 13, w: 71.57, h: 8,
+        fontId: "elegant", fontSizePct: 6.5, align: "center",
+        color: "#6b4739", bold: true, italic: false,
+      },
+      { type: "photo", src: null, shape: "rounded", x: 21.75, y: 26, w: 56.51, h: 40 },
+      {
+        type: "text",
+        text: "IME PREZIME",
+        x: 21.75, y: 71, w: 56.51, h: 6,
+        fontId: "elegant", fontSizePct: 4, align: "center",
+        color: "#6b4739", bold: true, italic: false, letterSpacing: 0.1,
+      },
+      {
+        type: "text",
+        text: "WISH YOU ALL THE BEST",
+        x: 21.75, y: 90.5, w: 56.51, h: 4.5,
+        fontId: "modern", fontSizePct: 2.2, align: "center",
+        color: "#c1856d", bold: false, italic: false, letterSpacing: 0.25,
       },
     ],
   },
@@ -928,7 +1320,11 @@ export default function Editor({ typeId }) {
   function applyCoverStyle(styleId) {
     if (!activePage) return;
     if (activePage.coverStyle === styleId) return;
-    const style = COVER_STYLES.find((s) => s.id === styleId);
+    const style = [
+      ...WEDDING_COVER_STYLES,
+      ...BIRTHDAY_COVER_STYLES,
+      ...ROD18_COVER_STYLES,
+    ].find((s) => s.id === styleId);
     if (!style) return;
 
     const hasExisting = activePage.elements.some((e) => e.coverStyleSlot);
@@ -1063,11 +1459,16 @@ export default function Editor({ typeId }) {
       ]);
       const html2canvas = html2canvasModule.default;
 
-      // Izvoz prati isti raspored kao editor: svaki razvod (korice ili dve
-      // strane) ide na JEDAN list u PDF-u — korice kao B3 (2×B4), ostali
-      // razvodi kao A3 (2×A4) — uz 1cm bele margine sa svake strane. Svaki
-      // razvod može imati svoju temu, pa se slika učitava po razvodu.
-      const exportViews = buildAlbumViews(album.pages);
+      // Izvoz NE prati raspored editora (strana po redu čitanja), već
+      // raspored za štampu — kao kod novina/knjižnog poveza: prvo korice,
+      // pa sadržajne strane uparene spolja ka unutra (prva sa poslednjom,
+      // druga sa pretposlednjom, itd). Svaki list ide na JEDAN list u PDF-u
+      // — korice kao B3 (2×B4), ostali listovi kao A3 (2×A4) — uz 1cm bele
+      // margine sa svake strane. Svaki list može imati svoju temu, pa se
+      // slika učitava po listu. Raspored se sam prilagođava broju strana
+      // (30, 32, 34...), jer se sadržajne strane uvek dodaju/uklanjaju u
+      // parovima.
+      const exportViews = buildExportViews(album.pages);
       let doc = null;
 
       for (let i = 0; i < exportViews.length; i++) {
@@ -1384,14 +1785,20 @@ export default function Editor({ typeId }) {
             </section>
           )}
 
-          {typeId === "vencanje" && activePage.role === "cover-front" && (
+          {(typeId === "vencanje" || typeId === "rodjendan" || typeId === "rodjendan18") &&
+            activePage.role === "cover-front" && (
             <section className={styles.panelSection}>
               <h3>Stil korice</h3>
               <p className={styles.hint}>
                 Gotov dizajn korice — posle izbora samo zamenite sliku i upišite imena.
               </p>
               <div className={styles.coverStyleRow}>
-                {COVER_STYLES.map((s) => (
+                {(typeId === "vencanje"
+                  ? WEDDING_COVER_STYLES
+                  : typeId === "rodjendan18"
+                  ? ROD18_COVER_STYLES
+                  : BIRTHDAY_COVER_STYLES
+                ).map((s) => (
                   <button
                     type="button"
                     key={s.id}
@@ -1400,7 +1807,7 @@ export default function Editor({ typeId }) {
                     }`}
                     onClick={() => applyCoverStyle(s.id)}
                   >
-                    <CoverStylePreviewIcon elements={s.elements} />
+                    <img src={s.thumbnail} alt={s.label} className={styles.coverStyleIcon} />
                     <span>{s.label}</span>
                   </button>
                 ))}
@@ -1474,7 +1881,9 @@ export default function Editor({ typeId }) {
                       selectedElement.fontId === f.id ? styles.fontBtnActive : ""
                     }`}
                     style={{ fontFamily: f.family }}
-                    onClick={() => updateElement(selectedElement.id, { fontId: f.id })}
+                    onClick={() =>
+                      updateElement(selectedElement.id, { fontId: f.id, customFontFamily: undefined })
+                    }
                     title={f.label}
                   >
                     Ab
@@ -1889,17 +2298,27 @@ function StageElement({
               alt=""
               draggable={false}
               className={styles.photo}
-              style={{ objectPosition: `${el.focalX ?? 50}% ${el.focalY ?? 50}%` }}
+              style={{
+                objectPosition: `${el.focalX ?? 50}% ${el.focalY ?? 50}%`,
+                borderRadius: shapeRadius(el.shape),
+              }}
             />
             {el.darken > 0 && (
               <div
                 className={styles.photoDarken}
-                style={{ opacity: el.darken }}
+                style={{
+                  opacity: el.darken,
+                  borderRadius: shapeRadius(el.shape),
+                }}
               />
             )}
           </>
         ) : (
-          <div className={styles.emptySlot} data-empty-slot>
+          <div
+            className={styles.emptySlot}
+            data-empty-slot
+            style={{ borderRadius: shapeRadius(el.shape) }}
+          >
             <span className={styles.emptySlotPlus}>+</span>
             <span className={styles.emptySlotLabel}>Dodaj sliku</span>
           </div>
@@ -1916,7 +2335,10 @@ function StageElement({
           style={{
             width: "100%",
             height: "100%",
-            backgroundColor: el.color,
+            backgroundColor: el.image ? undefined : el.color,
+            backgroundImage: el.image ? `url(${el.image})` : undefined,
+            backgroundSize: el.image ? "cover" : undefined,
+            backgroundPosition: el.image ? "center" : undefined,
             opacity: el.opacity ?? 1,
           }}
         />
@@ -1929,7 +2351,7 @@ function StageElement({
           suppressContentEditableWarning
           onBlur={onBlurText}
           style={{
-            fontFamily: getFont(el.fontId).family,
+            fontFamily: el.customFontFamily || getFont(el.fontId).family,
             fontSize: `${el.fontSizePct}cqw`,
             color: el.color,
             fontWeight: el.bold ? 700 : 400,
@@ -1966,79 +2388,6 @@ function LayoutPreviewIcon({ rects }) {
           style={{ left: `${r.x}%`, top: `${r.y}%`, width: `${r.w}%`, height: `${r.h}%` }}
         />
       ))}
-    </span>
-  );
-}
-
-// Mala vizuelna ikonica u panelu koja pokazuje grub raspored jednog stila
-// korice: fotografija (sivo), trake (u svojoj boji), tekst (tanka traka u
-// svojoj boji, sa minimalnom visinom da se vidi i na ovoj veličini).
-function CoverStylePreviewIcon({ elements }) {
-  return (
-    <span className={styles.coverStyleIcon}>
-      {elements.map((el, i) => {
-        if (el.type === "photo") {
-          return (
-            <span
-              key={i}
-              className={styles.coverIconPhoto}
-              style={{
-                left: `${el.x}%`,
-                top: `${el.y}%`,
-                width: `${el.w}%`,
-                height: `${el.h}%`,
-                boxShadow: el.darken
-                  ? `inset 0 0 0 999px rgba(0,0,0,${el.darken})`
-                  : "none",
-              }}
-            />
-          );
-        }
-        if (el.type === "shape") {
-          return (
-            <span
-              key={i}
-              style={{
-                left: `${el.x}%`,
-                top: `${el.y}%`,
-                width: `${el.w}%`,
-                height: `${el.h}%`,
-                background: el.color,
-                opacity: el.opacity ?? 1,
-              }}
-            />
-          );
-        }
-        if (el.type === "sticker") {
-          return (
-            <span
-              key={i}
-              style={{
-                left: `${el.x}%`,
-                top: `${el.y}%`,
-                width: `${el.w}%`,
-                height: `${el.h}%`,
-                background: "#b8895a",
-                borderRadius: "50%",
-              }}
-            />
-          );
-        }
-        const h = Math.max(el.h, 9);
-        return (
-          <span
-            key={i}
-            style={{
-              left: `${el.x}%`,
-              top: `${el.y}%`,
-              width: `${el.w}%`,
-              height: `${h}%`,
-              background: el.color,
-              borderRadius: "1px",
-            }}
-          />
-        );
-      })}
     </span>
   );
 }

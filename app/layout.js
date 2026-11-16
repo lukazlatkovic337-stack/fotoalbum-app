@@ -1,4 +1,4 @@
-import { Playfair_Display, Poppins, Dancing_Script } from "next/font/google";
+import { Playfair_Display, Poppins, Dancing_Script, Permanent_Marker } from "next/font/google";
 import "./globals.css";
 
 // Ovo su jedina tri fonta koja aplikacija nudi za tekst u albumu
@@ -21,6 +21,14 @@ const fontScript = Dancing_Script({
   variable: "--font-script",
   display: "swap",
 });
+// Van ponude od 3 fonta — koristi se samo kao vizuelna zamena za
+// konkretan tekstualni element na gotovoj korici (ne nudi se u panelu).
+const fontMarker = Permanent_Marker({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-marker",
+  display: "swap",
+});
 
 export const metadata = {
   title: "MakeBook – kreirajte svoj foto album",
@@ -32,7 +40,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="sr"
-      className={`${fontElegant.variable} ${fontModern.variable} ${fontScript.variable}`}
+      className={`${fontElegant.variable} ${fontModern.variable} ${fontScript.variable} ${fontMarker.variable}`}
     >
       <body>{children}</body>
     </html>
